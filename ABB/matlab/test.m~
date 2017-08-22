@@ -1,0 +1,8 @@
+n = size(N,1);
+dg = 10000*ones(n,n);
+for i = 1:n
+    for j = 1:length(N{i})
+        DG(i,N{i}(j)) = D{i}(j);
+    end
+end
+        

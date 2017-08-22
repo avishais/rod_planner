@@ -1,0 +1,5 @@
+milestones - stores the milestones in their index order. Stored in milestones.txt and in Matrix 'milestones'.
+
+sub_milestones - stores the nodes (only vectors) on the lines between the 
+
+
