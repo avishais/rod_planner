@@ -215,6 +215,8 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::walk_on_PRM(TreeData &
 
 ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerminationCondition &ptc)
 {
+	initiate_log_parameters();
+
 	// Load roadmap from .prm file
 	startTime = clock();
 	load_data(prmfile);
@@ -223,9 +225,6 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	int ms_size = ms.milestones.size();
 	int subms_size = subms.sub_milestones.size();
 	OMPL_INFORM("%s: Loaded PRM with %d milestones and %d sub-milestones", getName().c_str(), ms_size, subms_size);
-
-	initiate_log_parameters();
-	//setRange(Range);
 
 	State a(6), as(6), ag(6);
 
@@ -240,7 +239,6 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	retrieveStateVector(st2, ag);
 	//cout << sNg_k << endl;
 	VectorInt new_ms_indices = add_start_n_goal_milestones(as, ag, sNg_k);
-	sg_connect_time = double(clock() - startTime) / CLOCKS_PER_SEC;
 	
 	clock_t mStart = clock();
 	// ----- Add start state ------ 
@@ -336,14 +334,16 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 
 			// Add the connection of the two trees as nodes to the start tree
 			Matrix M = get_q_rigid_path();
+			State a = startMotion->a_data_in_PRM.index_indicator ? ms.milestones[startMotion->a_data_in_PRM.index] : subms.sub_milestones[startMotion->a_data_in_PRM.index];
 			for (int i = 0; i < M.size(); i++) {
 				// create a motion
 				Motion *motion = new Motion(si_);
-				updateStateVector(rstate, startMotion->a_data_in_PRM.a, M[i]);
+				updateStateVector(rstate, a, M[i]);
 				si_->copyState(motion->state, rstate);
-				motion->parent = nmotion;
-				motion->root = nmotion->root;
+				motion->parent = startMotion;
+				motion->root = startMotion->root;
 				tStart_->add(motion);
+				startMotion = motion;
 			}
 
 			// it must be the case that either the start tree or the goal tree has made some progress
@@ -377,6 +377,9 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 			nodes_in_path = mpath1.size() + mpath2.size();
 			nodes_in_trees = tStart_->size() + tGoal_->size();
 
+			final_solved = true;
+			LogPerf2file();
+
 			PathGeometric *path = new PathGeometric(si_);
 			path->getStates().reserve(mpath1.size() + mpath2.size());
 			for (int i = mpath1.size() - 1 ; i >= 0 ; --i)
@@ -398,6 +401,9 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 		total_runtime = double(endTime - startTime) / CLOCKS_PER_SEC;
 
 		nodes_in_trees = tStart_->size() + tGoal_->size();
+
+		final_solved = false;
+		LogPerf2file();
 	}
 
 	si_->freeState(rstate);
@@ -418,9 +424,6 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	cout << "  ---------------------------------------\n";
 
 	OMPL_INFORM("%s: Created %u states (%u start + %u goal)", getName().c_str(), tStart_->size() + tGoal_->size(), tStart_->size(), tGoal_->size());
-
-	final_solved = solved;
-	LogPerf2file();
 
 	return solved ? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT;
 }

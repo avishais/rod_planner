@@ -181,7 +181,6 @@ public:
 	int nodes_in_trees; // Log nodes in both trees
 	double PlanDistance; // Norm distance from start to goal configurations
 	bool final_solved; // Planning query solved?
-	double sg_connect_time; // Time to connect rod start and goal conf. to roadmap
 	double load_runtime; // Roadmap load time
 
 	/** Reset log parameters */
@@ -193,7 +192,6 @@ public:
 		isValid_counter = 0;
 		nodes_in_path = 0;
 		nodes_in_trees = 0;
-		sg_connect_time = 0;
 		load_runtime = 0;
 	}
 

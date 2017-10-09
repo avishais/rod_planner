@@ -632,6 +632,8 @@ bool StateValidityChecker::check_rigid_motion(const ob::State *st1, const ob::St
 	q_rigid_path.clear();
 
 	double d = AngleDistance(st1, st2);
+	if (d < RBS_tol)
+		return true;
 	int nd = d / RBS_tol;
 
 	Matrix Q = aPRM1.index_indicator ? ms.T_end[aPRM1.index] : subms.T_end[aPRM1.index];
@@ -685,7 +687,7 @@ void StateValidityChecker::LogPerf2file() {
 	myfile << get_odes_counter() << endl;
 	myfile << get_valid_odes_counter() << endl;
 	myfile << get_odes_time() << endl;
-	myfile << sg_connect_time << endl;
+	myfile << get_add_startNgoal_runtime() << endl;
 	myfile << load_runtime << endl;
 
 	myfile.close();
