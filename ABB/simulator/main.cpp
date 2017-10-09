@@ -1147,13 +1147,13 @@ void execute_path(int k){
 	//std::cout << "Cong.: " << k << std::endl;
 
 	if(k == 0){
-		const char* rod_pfile = "../path/rod_path.txt";
-		const char* robot_pfile = "../path/robot_paths.txt";
+		const char* rod_pfile = "../paths/rod_path.txt";
+		const char* robot_pfile = "../paths/path.txt";
 		FILE *fro, *fr;
 		int i, nlines;
 
 		fr = fopen(robot_pfile,"r");
-		if (fr == NULL) { fprintf(stderr,"Couldn't open robot_path.txt\n"); exit(-1); }
+		if (fr == NULL) { fprintf(stderr,"Couldn't open path.txt\n"); exit(-1); }
 		fscanf(fr,"%i",&nlines);  //NOT include number in line count itself
 		RoboStates.resize(nlines);
 
@@ -1325,7 +1325,7 @@ int main(int argc, char **argv)
 	//glutIdleFunc(IdleCB);
 	glutMouseFunc(MouseCB);
 	glutMotionFunc(MotionCB);
-	//glutKeyboardFunc(KeyboardCB);
+	glutKeyboardFunc(KeyboardCB);
 	glutReshapeWindow(1000,1000);
 
 	// Enter the main loop.

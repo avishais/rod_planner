@@ -574,7 +574,7 @@ void DisplayCB()
 			glPopMatrix();
 		}
 
-		// Obs 1
+		// Obs 2
 		MRotZ(Mobs,0);
 		//MxM(R0,Mobs,Mobs);
 
@@ -1039,7 +1039,7 @@ void load_models(){
 		p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
 		p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
 		p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-		EE2.AddTri(p1,p2,p3,i);
+		table.AddTri(p1,p2,p3,i);
 	}
 	table.EndModel();
 	fclose(fp);
@@ -1147,13 +1147,13 @@ void execute_path(int k){
 	//std::cout << "Cong.: " << k << std::endl;
 
 	if(k == 0){
-		const char* rod_pfile = "../path/rod_path.txt";
-		const char* robot_pfile = "../path/robot_paths.txt";
+		const char* rod_pfile = "../paths/rod_path.txt";
+		const char* robot_pfile = "../paths/path.txt";
 		FILE *fro, *fr;
 		int i, nlines;
 
 		fr = fopen(robot_pfile,"r");
-		if (fr == NULL) { fprintf(stderr,"Couldn't open robot_path.txt\n"); exit(-1); }
+		if (fr == NULL) { fprintf(stderr,"Couldn't open path.txt\n"); exit(-1); }
 		fscanf(fr,"%i",&nlines);  //NOT include number in line count itself
 		RoboStates.resize(nlines);
 
@@ -1265,8 +1265,8 @@ void execute_path(int k){
 	//PQP_Distance(&dres,R0,T0,&rod,R0,T0,&base,rel_err,abs_err);
 
 	if(k<RoboStates.size()) {
-		if (step==1)
-			sleep(3);
+		//if (step==1)
+		//	sleep(3);
 
 		step+=1;
 		//we see that middle pose gets called, second is not

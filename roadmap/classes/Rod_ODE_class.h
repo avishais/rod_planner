@@ -127,7 +127,6 @@ public:
 		odes_time = num;
 	}
 
-
 	// Stream the integrate_**** to m_out (file or cout)
 	struct streaming_observer
 	{
