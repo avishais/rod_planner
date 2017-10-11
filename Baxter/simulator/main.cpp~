@@ -11,9 +11,10 @@
 
 PQP_Model base, link1, link2, link3, link4, link5, link6, link7, ped;
 Model *base_to_draw, *link1_to_draw, *link2_to_draw, *link3_to_draw, \
-*link4_to_draw, *link5_to_draw, *link6_to_draw, *link7_to_draw, *ped_to_draw, *clamps_to_draw, *clamps_to_draw2;
+*link4_to_draw, *link5_to_draw, *link6_to_draw, *link7_to_draw, *ped_to_draw, *clamps_to_draw, *clamps_to_draw2, *table_to_draw, *obs1_to_draw, *wall_to_draw;
 
 PQP_Model base2, link12, link22, link32, link42, link52, link62, link72, rod, EE, EE2, clmp, clmp2;
+PQP_Model table, obs1, wall;
 Model *link1_to_draw2, *link2_to_draw2, *link3_to_draw2, \
 *link4_to_draw2, *link5_to_draw2, *link6_to_draw2, *link7_to_draw2, \
 *rod_to_draw, *EE_to_draw, *EE_to_draw2;
@@ -27,6 +28,7 @@ PQP_REAL M0[3][3],M1[3][3],M2[3][3],M3[3][3],M4[3][3],Trod[3], Trod2[3];
 PQP_REAL M5[3][3],M6[3][3],M7[3][3],M8[3][3],TEE[3],TEE2[3];
 
 int step;
+bool withObs = false;
 
 double oglm[16];
 
@@ -49,7 +51,7 @@ Matrix_robo RoboStates;
 
 int mode;
 double beginx, beginy;
-double dis = 2300.0, azim = 0.0, elev = 20.0, swi = -120;//-115;
+double dis = 2300.0, azim = -30.0, elev = 38.0, swi = -120;//-115;
 double ddis = 700.0, dazim = 0.0, delev = 0.0;
 double rot1, rot2, rot3, rot4, rot5, rot6, rot12, rot22, rot23, rot32, rot42, rot52, rot62, rot7, rot72;
 int visualizeRobots = 1, visualize = 1;
@@ -113,7 +115,7 @@ void InitViewerWindow()
 	glEnable(GL_DEPTH_TEST);
 
 	glShadeModel(GL_FLAT);
-	glClearColor(1.,1.,1.,0.);//(175./255, 238./255, 238./255, 0.0);//1.0, 1.0, 0.7, 0.0);  //background color
+	glClearColor(175./255, 238./255, 238./255, 0.0);//1.0, 1.0, 0.7, 0.0);  //background color
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -612,17 +614,17 @@ void DisplayCB()
 		EE_to_draw2->Draw();
 		glPopMatrix();
 	}
-/*
-	double width = 1500.0f;
+
+	double width = 2000.0f;
 	glBegin(GL_QUADS);
-	glColor3f(117.0/255, 67.0/255, 54.0/255);
+	glColor3f(1.5*117.0/255, 1.5*67.0/255, 1.5*54.0/255);
 	glNormal3f(0.0f, 0.0f, 1.0f);
 	glVertex3f(width, -3*width, -850.f);
 	glVertex3f(width, 3*width, -850.f);
 	glVertex3f(-width, 3*width, -850.f);
 	glVertex3f(-width, -3*width, -850.0f);
 	glEnd();
-*/
+
 	// ----- Reposition rod at center of EE
 	T2[0] =  0;
 	T2[1] =  0;//$.1*1000;
@@ -780,7 +782,8 @@ void DisplayCB()
 
 		//MxVpV(V,Rrod,P,TEE);
 		MxVpV(V,Rrod,P,Trod);
-		glColor3d(.93, .69, .13);//.93, .69, .13);//
+		//glColor3d(.93, .69, .13);//.93, .69, .13);//
+		glColor3d(1.0, 1.0, 1.0);//.93, .69, .13);//
 		glPushMatrix();
 		glTranslated(V[0],V[1],V[2]);
 		glutSolidSphere(14,15,15);
@@ -819,6 +822,40 @@ void DisplayCB()
 		glMultMatrixd(oglm);
 		clamps_to_draw2->Draw();
 		glPopMatrix();
+	}
+
+	if(withObs){
+		// Table
+		MRotZ(R0,3.1415926/2);
+		Ti[0]=1000; Ti[1]=0; Ti[2]=20;
+		glColor3d(.93, .69, .13);//172/255.0, 102/255.0, 13/255.0);//0.0,0.0,1.0);
+		MVtoOGL(oglm,R0,Ti);
+		glPushMatrix();
+		glMultMatrixd(oglm);
+		table_to_draw->Draw();
+		glPopMatrix();
+
+		// Obs 1
+		/*MRotZ(R0,0);
+		Ti[0] = 900; Ti[1] = -175; Ti[2] = -100;
+		glColor3d(1.0,1.0,1.0);
+		MVtoOGL(oglm,R0,Ti);
+		glPushMatrix();
+		glMultMatrixd(oglm);
+		obs1_to_draw->Draw();
+		glPopMatrix();*/
+
+		// Wall
+		MRotZ(R0,0*3.1415926/180);
+		Ti[0] = 1010; Ti[1] = -20; Ti[2] = 170;
+		//Ti[0] = 980; Ti[1] = -125; Ti[2] = 50;
+		glColor3d(1.0,0.0,0.0);
+		MVtoOGL(oglm,R0,Ti);
+		glPushMatrix();
+		glMultMatrixd(oglm);
+		wall_to_draw->Draw();
+		glPopMatrix();
+
 	}
 
 	EndDraw();
@@ -1275,19 +1312,92 @@ void load_models(){
 	}
 	clmp2.EndModel();
 	fclose(fp);
+
+	// Obstacles
+
+	if (withObs) {
+
+		// initialize table
+		table_to_draw = new Model("table.tris");
+
+		fp = fopen("table.tris","r");
+		if (fp == NULL) { fprintf(stderr,"Couldn't open table.tris\n"); exit(-1); }
+		fscanf(fp,"%d",&ntris);
+
+		table.BeginModel();
+		for (i = 0; i < ntris; i++)
+		{
+			double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
+			fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+					&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
+			PQP_REAL p1[3],p2[3],p3[3];
+			p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
+			p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
+			p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
+			table.AddTri(p1,p2,p3,i);
+		}
+		table.EndModel();
+		fclose(fp);
+
+		// initialize obs1
+		obs1_to_draw = new Model("obs.tris");
+
+		fp = fopen("obs.tris","r");
+		if (fp == NULL) { fprintf(stderr,"Couldn't open obs.tris\n"); exit(-1); }
+		fscanf(fp,"%d",&ntris);
+
+		obs1.BeginModel();
+		for (i = 0; i < ntris; i++)
+		{
+			double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
+			fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+					&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
+			PQP_REAL p1[3],p2[3],p3[3];
+			p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
+			p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
+			p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
+			obs1.AddTri(p1,p2,p3,i);
+		}
+		obs1.EndModel();
+		fclose(fp);
+
+		// initialize wall
+		wall_to_draw = new Model("wall4s.tris");
+
+		fp = fopen("wall4s.tris","r");
+		if (fp == NULL) { fprintf(stderr,"Couldn't open wall.tris\n"); exit(-1); }
+		fscanf(fp,"%d",&ntris);
+
+		wall.BeginModel();
+		for (i = 0; i < ntris; i++)
+		{
+			double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
+			fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+					&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
+			PQP_REAL p1[3],p2[3],p3[3];
+			p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
+			p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
+			p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
+			wall.AddTri(p1,p2,p3,i);
+		}
+		wall.EndModel();
+		fclose(fp);
+	}
+
+
 }
 
 
 void execute_path(int k){
 
 	if(k == 0){
-		const char* rod_pfile = "../path/rod_path.txt";
-		const char* robot_pfile = "../path/robot_paths.txt";
+		const char* rod_pfile = "../paths/rod_path.txt";
+		const char* robot_pfile = "../paths/path.txt";
 		FILE *fro, *fr;
 		int i, nlines;
 
 		fr = fopen(robot_pfile,"r");
-		if (fr == NULL) { fprintf(stderr,"Couldn't open robot_path.txt\n"); exit(-1); }
+		if (fr == NULL) { fprintf(stderr,"Couldn't open path.txt\n"); exit(-1); }
 		fscanf(fr,"%i",&nlines);  //NOT include number in line count itself
 		RoboStates.resize(nlines);
 
@@ -1383,10 +1493,8 @@ void execute_path(int k){
 	}
 
 	if(k<RoboStates.size()) {
-		//if (step==1)
-		//	sleep(3);
-
-		std::cout << step << std::endl;
+		if (step==1)
+			sleep(3);
 
 		step+=1;
 		//we see that middle pose gets called, second is not

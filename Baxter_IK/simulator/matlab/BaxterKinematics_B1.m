@@ -1,0 +1,306 @@
+% Updated:
+
+classdef BaxterKinematics_B1 < handle
+    properties
+        pose % desired position and orientation of the robot on the x-y plane.
+        edgecolor % incluFde edgecolor 'c' or no 'none'.
+        quality % use 'fine' mesh or 'coarse'.
+        L % Links lengths
+        L_EE % EE lenght
+        baseH % Base height
+        T_pose % Robot position and orientation matrix
+        xyz % Current position of EE
+        T % Current transformation matrix of EE
+        
+        b % base
+        l1
+        l2
+        l3
+        l4
+        l5
+        l6
+        l7
+        lEE
+        
+        
+        % Joint limits
+        q1minmax
+        q2minmax
+        q3max
+        q3min
+        q4minmax
+        q5minmax
+        q6minmax
+    end
+    
+    methods
+        %% RobotArm
+        function this = BaxterKinematics_B1()
+            this.b = 1000*[0;0;0];
+            this.l1 = 1000*[0.024645+0.055695-0.02; -0.25; 0.118588+0.011038];
+            this.l2 = 1000*[0.073; 0; 0.245];
+            this.l3 = 1000*[0.102; 0; 0];
+            this.l4 = 1000*[0.069; 0; 0.26242-0.015];
+            this.l5 = 1000*[0.10; 0; 0];
+            this.l6 = 1000*[0.01; 0; 0.2707];
+            this.l7 = 1000*[0.16; 0; 0];
+            this.lEE = 1000*[0; 0; 0.05]+[0;0;0.1*1000]; % Extension by 0.1 to be at the middle of the gripper
+            
+            % Joint limits - Real
+            this.q1minmax(1) = deg2rad(165);
+            this.q2minmax(1) = deg2rad(110);
+            this.q3min(1) = deg2rad(-110); this.q3max(1) = deg2rad(70);
+            this.q4minmax(1) = deg2rad(160);
+            this.q5minmax(1) = deg2rad(120);
+            this.q6minmax(1) = deg2rad(400);
+            
+        end
+        
+        %% FK
+        function T = FK(this, theta, robot_number)
+            theta1 = rad2deg(theta);
+            
+            L1 = this.l1;
+            if robot_number == 2
+                L1(2) = -L1(2);
+            end
+            
+            T01 = this.Tt(this.b) * this.Tt(L1) * this.Tz(theta(1));
+            T02 = T01*this.Tt(this.l2)*this.Ty(theta(2))*this.Tx(-pi/2);
+            T03 = T02*this.Tt(this.l3)*this.Tx(theta(3)+pi/2)*this.Ty(pi/2);
+            T04 = T03*this.Tt(this.l4)*this.Ty(theta(4))*this.Tx(pi/2);
+            T05 = T04*this.Tt(this.l5)*this.Tx(theta(5)-pi/2)*this.Ty(pi/2);
+            T06 = T05*this.Tt(this.l6)*this.Ty(theta(6)-pi/2)*this.Tx(pi/2);
+            T07 = T06*this.Tt(this.l7)*this.Tx(theta(7)+pi/2)*this.Ty(pi/2);
+            T0EE = T07 * this.Tt(this.lEE); 
+
+            T = T0EE;
+            
+        end
+        
+        %% Tz Tx Ty
+        function T = Tz(this, x)
+            
+            T = [cos(x) -sin(x) 0 0; sin(x) cos(x) 0 0; 0 0 1 0; 0 0 0 1];
+            
+        end
+        
+        function T = Ty(this, x)
+            
+            T = [cos(x) 0 sin(x) 0; 0 1 0 0; -sin(x) 0 cos(x) 0; 0 0 0 1];
+            
+        end
+        
+        function T = Tx(this, x)
+            
+            T = [1 0 0 0; 0 cos(x) -sin(x) 0; 0 sin(x) cos(x) 0; 0 0 0 1];
+            
+        end
+        
+        function T = Tt(this, v)
+            
+            T = [[eye(3) v]; 0 0 0 1];
+            
+        end
+        
+        %%
+        function print2file(this, thetas)
+            fileID = fopen('/home/avishai/Downloads/omplapp/ompl/Workspace/precomputation/path/robot_paths_Bx.txt','w');
+            fprintf(fileID,'1\n');
+            for i = 1:size(thetas)
+                fprintf(fileID,'%f ',thetas(i));
+            end
+            fclose(fileID);
+            
+        end
+        
+        %% IKP
+        function [q, fail] = IKP(this, T, LimitsMode, solution_num)
+            % Inverse kinematics calculation for the ABB IRB 120 robot
+            % T - is the desired position and orientation matrix of the gripper in the
+            % world CF
+            % LimitsMode - 1 for real limits and 2 for bias (safety factor)
+            % limits, 3- relaxed limits
+            % fail - 1 if failed to find a solution, 0 - found a solution.
+            
+            if nargin < 4
+                solution_num = 1;
+            end
+            %             q1_add =  [ 0  0  0  0 -pi -pi -pi -pi];
+            %             q2_sign = [-1 -1  1  1  -1  -1   1   1];
+            %             sign456 = [ 1 -1  1 -1   1  -1   1  -1];
+            q1_add  = [ 0  0  0  0 pi pi pi pi -pi -pi -pi -pi];
+            q2_sign = [-1 -1 -1 -1  1  1  1  1   1   1   1   1];
+            q3_sign = [ 1 -1  1 -1  1 -1  1 -1   1  -1   1  -1];
+            sign456 = [ 1 -1 -1  1 -1  1  1 -1  -1   1   1  -1];
+            
+            
+            q = zeros(6,1);
+            fail = 1;
+            
+            b = this.baseH;
+            L1 = this.L(1);
+            L2 = this.L(2);
+            L3a = this.L(3);
+            L3b = this.L(4);
+            L4 = this.L(5);
+            L5 = this.L(6);
+            L_EE = this.L_EE;
+            
+            L34 = (L3a^2 + (L3b+L4)^2)^0.5; % Distance from joint 23 axis to joint 45 axis.
+            alpha = atan2(L3b+L4, L3a); % Angle in the base of the triangle of link 3.
+            
+            %% %%
+            
+            if any(size(T)==1)
+                
+                % Gripper position
+                x = T(1);
+                y = T(2);
+                z = T(3);
+                tr = T(4); % roll
+                tp = T(5); % pitch relative to the world z axis. That is, zero pitch is the ee pointing up
+                ty = T(6); % yaw
+                
+                % Gripper orientation matrix
+                cy = cos(ty);
+                cp = cos(tp);
+                cr = cos(tr);
+                sy = sin(ty);
+                sp = sin(tp);
+                sr = sin(tr);
+                R = this.T_pose(1:3,1:3)*[cy*cp, cy*sp*sr-sy*cr, cy*sp*cr+sy*sr;
+                    sy*cp, sy*sp*sr+cy*cr, sy*sp*cr-cy*sr;
+                    -sp, cp*sr, cp*cr];
+            else
+                % Gripper position
+                T = this.T_pose\T;
+                x = T(1,4);
+                y = T(2,4);
+                z = T(3,4);
+                
+                % Gripper orientation matrix
+                R = T(1:3,1:3);
+            end
+            
+            x6 = R(:,1); % Gripper x-axis
+            
+            %% %%
+            % q1
+            p5 = [x;y;z] - x6*(L5+L_EE);
+            q1 = atan2(p5(2),p5(1))+q1_add(solution_num); % If sign2 (on q2) equals 1, add -pi to q1.
+            %             disp(rad2deg(q1))
+            %             if q1 > 0
+            %                 q1 = q1 + q1_add(solution_num);
+            %             else
+            %                 q1 = q1 - q1_add(solution_num);
+            %             end
+            if q1>pi
+                q1 = q1 - 2*pi;
+            end
+            if q1<-pi
+                q1 = q1 + 2*pi;
+            end
+            
+            
+            
+            
+            %             if abs(q1) > this.q1minmax(LimitsMode)
+            %                 return;
+            %             end
+            
+            % q3
+            k2 = (p5(1)^2 + p5(2)^2); % = k^2
+            D2 = k2 + (p5(3)-(L1+b))^2; % = D^2
+            cosphi = (D2-L2^2-L34^2)/(2*L2*L34);
+            sinphi = q3_sign(solution_num)*(1-cosphi^2)^0.5;
+            if imag(sinphi)
+                return;
+            end
+            %             phi = atan2(sinphi,cosphi);
+            %             q3 = -(phi - pi + alpha);
+            q3 = -(atan2(sinphi,cosphi)+alpha);
+            %             if q3 < this.q3min(LimitsMode) || q3 > this.q3max(LimitsMode)
+            %                 return;
+            %             end
+            
+            if q3>pi
+                q3 = q3 - 2*pi;
+            end
+            if q1<-pi
+                q3 = q3 + 2*pi;
+            end
+            
+            % q2
+            sinalpha1 = -L34*(sinphi)/(D2^0.5);
+            alpha1 = atan2(-q2_sign(solution_num)*sinalpha1,(1-sinalpha1^2)^0.5);
+            alpha2 = atan2(p5(3)-L1-b,k2^0.5);
+            q2 = q2_sign(solution_num)*(alpha1 + alpha2 - pi/2);
+            % if q2 > pi; q2 = q2 - 2*pi; end;
+            %             if abs(q2) > this.q2minmax(LimitsMode)
+            %                 return;
+            %             end
+            
+            if q2>pi
+                q2 = q2 - 2*pi;
+            end
+            if q1<-pi
+                q2 = q2 + 2*pi;
+            end
+            
+            
+            %% %%%
+            
+            % Solved according to Spong's "Robot dynamics and control" page 91,96.
+            
+            
+            c23 = cos(q2+q3); s23 = sin(q2+q3);
+            c1 = cos(q1); s1 = sin(q1);
+            
+            % q5
+            % It is possible to use the cross to find the sign of q5 and by
+            % that, merge between two IK solutions.
+            %             x4 = [c23*c1; c23*s1; -s23];
+            %             S = dot(x4,x6);
+            %             sgn = sign(cross(x4,x6)); sgn = sgn(2);
+            %             q5 = sgn*atan2(sign456(solution_num)*(1-S^2)^0.5, S);
+            S = R(1,1)*c23*c1 - R(3,1)*s23 + R(2,1)*c23*s1;
+            q5 = atan2(sign456(solution_num)*(1-S^2)^0.5, S);
+            q5(abs(q5)<1e-4) = 0;
+            %             if abs(q5) > this.q5minmax(LimitsMode)
+            %                 return;
+            %             end
+            
+            if q5
+                % q4
+                sinq4 = R(2,1)*c1 - R(1,1)*s1;
+                cosq4 = R(3,1)*c23 + R(1,1)*s23*c1 + R(2,1)*s23*s1;
+                q4 = atan2(sign456(solution_num)*sinq4, -sign456(solution_num)*cosq4);
+                %                 q4 = atan2(sgn*sinq4, -sgn*cosq4);
+                
+                % q6
+                sinq6 = R(1,2)*c23*c1 - R(3,2)*s23 + R(2,2)*c23*s1;
+                cosq6 = R(1,3)*c23*c1 - R(3,3)*s23 + R(2,3)*c23*s1;
+                q6 = atan2(sign456(solution_num)*sinq6, sign456(solution_num)*cosq6);
+                %                 q6 = atan2(sgn*sinq6, sgn*cosq6);
+            else
+                % q4 + q6 = cons.
+                % We choose to set q4=0 and then decide q6.
+                q4 = 0;
+                q6 = atan2(R(3,2), R(3,3)); % or q6=atan2(R(3,2), R(2,2)) or q6=atan2(-R(2,3), R(3,3));
+            end
+            %             if abs(q6) >= this.q6minmax(LimitsMode) || abs(q4) >= this.q4minmax(LimitsMode)
+            %                 return;
+            %             end
+            
+            fail = 0;
+            q = [q1; q2; q3; q4; q5; q6];
+            q(abs(q)<1e-4) = 0;
+            %             rad2deg(q)% phi])
+            
+        end
+        
+    end
+    
+end
+

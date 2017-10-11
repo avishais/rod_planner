@@ -28,7 +28,7 @@ PQP_REAL M0[3][3],M1[3][3],M2[3][3],M3[3][3],M4[3][3],Trod[3], Trod2[3];
 PQP_REAL M5[3][3],M6[3][3],M7[3][3],M8[3][3],TEE[3],TEE2[3];
 
 int step;
-bool withObs = true;
+bool withObs = false;
 
 double oglm[16];
 
@@ -615,7 +615,7 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	double width = 2000.0f;
+	/*double width = 2000.0f;
 	glBegin(GL_QUADS);
 	glColor3f(1.5*117.0/255, 1.5*67.0/255, 1.5*54.0/255);
 	glNormal3f(0.0f, 0.0f, 1.0f);
@@ -623,7 +623,7 @@ void DisplayCB()
 	glVertex3f(width, 3*width, -850.f);
 	glVertex3f(-width, 3*width, -850.f);
 	glVertex3f(-width, -3*width, -850.0f);
-	glEnd();
+	glEnd();*/
 
 	// ----- Reposition rod at center of EE
 	T2[0] =  0;
@@ -1391,13 +1391,13 @@ void load_models(){
 void execute_path(int k){
 
 	if(k == 0){
-		const char* rod_pfile = "../path/rod_path.txt";
-		const char* robot_pfile = "../path/robot_paths.txt";
+		const char* rod_pfile = "../paths/rod_path.txt";
+		const char* robot_pfile = "../paths/path.txt";
 		FILE *fro, *fr;
 		int i, nlines;
 
 		fr = fopen(robot_pfile,"r");
-		if (fr == NULL) { fprintf(stderr,"Couldn't open robot_path.txt\n"); exit(-1); }
+		if (fr == NULL) { fprintf(stderr,"Couldn't open path.txt\n"); exit(-1); }
 		fscanf(fr,"%i",&nlines);  //NOT include number in line count itself
 		RoboStates.resize(nlines);
 
