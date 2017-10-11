@@ -28,7 +28,7 @@ PQP_REAL M0[3][3],M1[3][3],M2[3][3],M3[3][3],M4[3][3],Trod[3], Trod2[3];
 PQP_REAL M5[3][3],M6[3][3],M7[3][3],M8[3][3],TEE[3],TEE2[3];
 
 int step;
-bool withObs = false;
+bool withObs = true;
 
 double oglm[16];
 
@@ -38,7 +38,7 @@ int sim_velocity;
 PQP_REAL R02[3][3],R12[3][3],R22[3][3],T02[3],T12[3],T22[3];
 PQP_REAL R32[3][3],R42[3][3],R52[3][3],T32[3],T42[3],T52[5];
 PQP_REAL R62[3][3],R72[3][3],T62[3],T72[3],T2_t2[3];
-PQP_REAL R82[3][3],T82[3][3],RInt[3][3],MInt[3][3],Mrod[3][3],Rrod[3][3], Rrod2[3][3];
+PQP_REAL R82[3][3],T82[3][3],RInt[3][3],MInt[3][3],Mrod[3][3],Rrod[3][3], Rrod2[3][3], Rrod_v[3][3];
 PQP_REAL Rclp[3][3], Rclp2[3][3], Mclp[3][3];
 
 PQP_REAL M02[3][3],M12[3][3],M22[3][3],M32[3][3],M42[3][3];
@@ -763,19 +763,19 @@ void DisplayCB()
 	if (!grasp_pose)
 		pose_angle = -3.1415926/2; // Continuous to the arm
 	else
-		pose_angle = 3.1415926; // Perpendicular to the gripper plane - Add this to collisionChecker!!!!!
+		pose_angle = 3.1415926; // Perpendicular to the gripper plane
 
 	MRotY(Mrod,pose_angle);
 	MxM(Rrod, REE, Mrod);
 
-	// Fix based on updated kinematics in kdl_class.cpp from 10/10/2017 - Add this to collisionChecker!!!!!
+	// Fix based on updated kinematics in kdl_class.cpp from 10/10/2017
 	MRotX(Mrod,-3.1415926);
-	MxM(REE, Rrod, Mrod);
+	MxM(Rrod_v, Rrod, Mrod);
 
-	//pm(REE, "Ree");
-	//pm(Rrod, "Rrod");
-	//pm(Mrod, "Mrod");
-	//pv(Trod, "Trod");
+	/*pm(REE, "REE");
+	pm(Rrod, "Rrod");
+	pm(Rrod_v, "Rrod_v");
+	pv(Trod, "Trod");*/
 
 	int step1 = step-1;
 	for(int i=0;i<RodStates[step1].size();i++){
@@ -785,7 +785,7 @@ void DisplayCB()
 		P[2]=RodStates[step1][i][2];
 
 		//MxVpV(V,Rrod,P,TEE);
-		MxVpV(V,REE,P,Trod); // <--- Changed this also on 10/10/2017
+		MxVpV(V,Rrod_v,P,Trod); // <--- Changed this also on 10/10/2017
 		//glColor3d(.93, .69, .13);//.93, .69, .13);//
 		glColor3d(1.0, 1.0, 1.0);//.93, .69, .13);//
 		glPushMatrix();

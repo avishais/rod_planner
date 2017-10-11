@@ -2,6 +2,9 @@
 
 // Constructor for the robots
 Baxter::Baxter() {
+
+	grasp_pose = true;
+
 	b = 0;
 	l1x= 0.024645e3+0.055695e3-0.02e3;
 	l1y=-0.25e3;
@@ -20,7 +23,7 @@ Baxter::Baxter() {
 	// Joint limits
 	qmin.resize(7);
 	qmax.resize(7);
-	qmin[0] = deg2rad(-141); // S0
+	qmin[0] = deg2rad(-141); // S0 - Flip for Arm 2
 	qmax[0] = deg2rad(51);
 	qmin[1] = deg2rad(-123); // S1
 	qmax[1] = deg2rad(60);
@@ -60,6 +63,9 @@ Baxter::Baxter() {
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Rotation(1,0,0,0,0,-1,0,1,0)))); //
 	chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // ^Link 7
 	chain.addSegment(Segment(Joint(Joint::None),Frame(Vector(0.0,0.0,lEE)))); // EE
+
+	if (grasp_pose)
+		chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,-1,0,1,0,1,0,0)))); // EE - grasp continuous to the arm
 
 	// Create joint array
 	nj = chain.getNrOfJoints();
@@ -188,15 +194,17 @@ bool Baxter::IKsolve_rob(Matrix T, State q_init, int robot_num) {
 bool Baxter::check_angle_limits(State q, int robot_num) {
 
 	if (robot_num==1) {
-		for (int i = 0; i < q.size(); i++)
-			if (q[i] < qmin[i] || q[i] > qmax[i])
-				return false;
+		if (q[0] < qmin[0] || q[0] > qmax[0])
+			return false;
 	}
 	else {
-		for (int i = 0; i < q.size(); i++)
-			if (q[i] < -qmax[i] || q[i] > -qmin[i])
-				return false;
+		if (q[0] < -qmax[0] || q[0] > -qmin[0])
+			return false;
 	}
+
+	for (int i = 1; i < q.size(); i++)
+		if (q[i] < qmin[i] || q[i] > qmax[i])
+			return false;
 
 	return true;
 }
@@ -211,14 +219,8 @@ State Baxter::get_IK_solution_q2() {
 
 bool Baxter::calc_specific_IK_solution_R1(Matrix T_end, State q_active, State q_init) {
 	FKsolve_rob(q_active, 1);
-	//cout << "Tend: \n";
-	//printMatrix1(T_end);
-	//cout << "T1: \n";
-	//printMatrix1(get_FK_solution_T1());
 	Matrix T2 = MatricesMult(get_FK_solution_T1(), T_end); // Returns the opposing required matrix of the rods tip at robot 2
 	T2 = MatricesMult(T2, {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the REQUIRED matrix of the rods tip at robot 2
-	//cout << "T2: \n";
-	//printMatrix1(T2);
 	if (!IKsolve_rob(T2, q_init, 2))
 		return false;
 	return true;
@@ -230,8 +232,6 @@ bool Baxter::calc_specific_IK_solution_R2(Matrix T_end, State q_active, State q_
 	FKsolve_rob(q_active, 2);
 	Matrix T1 = MatricesMult(get_FK_solution_T2(), {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the opposing required matrix of the rods tip at robot 2
 	T1 = MatricesMult(T1, Tinv); // Returns the REQUIRED matrix of the rods tip at rob
-	//cout << "T1: \n";
-	//printMatrix1(T1);
 	if (!IKsolve_rob(T1, q_init, 1))
 		return false;
 	return true;
@@ -450,29 +450,30 @@ int main() {
 
 	Baxter K;
 
-	State q = {-PI/4,PI/2,PI/6,-PI/5,PI/3,1,-1.2};
-	K.printVector(q);
+	//State q = {-PI/4,PI/2,PI/6,-PI/5,PI/3,1,-1.2};
+	State q = {0.272898, -0.660043, 0.571277, 0.231013, 0.100897, -0.0446562, -2.57338};
+	K.printVector1(q);
 
 	//K.FKsolve_rob({0,0,0,0,0,0,0},1);
 	K.FKsolve_rob(q,1);
 	Matrix T1 = K.get_FK_solution_T1();
-	K.printMatrix(T1);
+	K.printMatrix1(T1);
 
 	//K.FKsolve_rob(q,2);
 	//Matrix T2 = K.get_FK_solution_T2();
-	/K.printMatrix(T2);
+	K.printMatrix1(T2);
 	q = {0,0,0,0,0,0,0};
 	cout << K.IKsolve_rob(T1, q, 1) << endl;
 	State qIK = K.get_IK_solution_q1();
-	K.printVector(qIK);
+	K.printVector1(qIK);
 	K.FKsolve_rob(qIK,1);
-	K.printMatrix(K.get_FK_solution_T1());
+	K.printMatrix1(K.get_FK_solution_T1());
 
-	cout << K.check_angle_limits(q) << endl;
-	cout << K.check_angle_limits(qIK) << endl;
+	//cout << K.check_angle_limits(q) << endl;
+	//cout << K.check_angle_limits(qIK) << endl;
 
-	K.printVector(K.generate_random_arm_configuration());
-	K.printVector(K.generate_random_arm_configuration());
+	//K.printVector(K.generate_random_arm_configuration());
+	//K.printVector(K.generate_random_arm_configuration());
 
 	return 0;
 }

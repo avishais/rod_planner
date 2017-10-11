@@ -23,7 +23,7 @@ LDFLAGS=  -L${OMPL_DIR}/lib -L${OMPL_DIR}/lib/x86_64-linux-gnu -lompl -lompl_app
 
 # ABB
 CPP_PRM = $(ROD_CLASSES)prm_gen.cpp $(ROD_CLASSES)/classes/Rod_ODE_class.cpp $(ROD_CLASSES)/classes/slice.cpp 
-CPP_PLN = $(INC_RUN)plan.cpp $(INC_PLANNERS)CBiRRT.cpp $(INC_CLASSES)abb_apc_class.cpp $(INC_CLASSES)kdl_class.cpp $(INC_VALIDITY)StateValidityChecker.cpp 
+CPP_ROB = $(INC_CLASSES)kdl_class.cpp $(INC_VALIDITY)StateValidityChecker.cpp 
 
 CPPPQP = ${INC_VALIDITY}collisionDetection.cpp ${INC_VALIDITY}model.cpp
 
@@ -31,6 +31,8 @@ CPP = $(INC_CLASSES)kdl_class.cpp
 
 all:
 	#${CXX} ${CPP_PLN} ${CPP_PRM} ${CPPPQP} -o pln ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
-	${CXX} test_kdl.cpp ${CPP} -o tst ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
+	#${CXX} test_kdl.cpp ${CPP} ${CPP_PRM} -o tst ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
+	#${CXX} test_collision.cpp ${CPP} ${CPP_PRM} ${CPPPQP} -o tcl ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
+	$(CXX) test_sample.cpp ${CPP_PRM} ${CPP_ROB} ${CPPPQP} -o trbs $(CXXFLAGS) $(LDFLAGS) -std=c++11	
 
 

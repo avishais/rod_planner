@@ -28,8 +28,8 @@ kdl::kdl(double D) {
 	qmax[1] = deg2rad(60);
 	qmin[2] = deg2rad(-173.5); // E0 - Flip for Arm 2
 	qmax[2] = deg2rad(173.5);
-	qmin[3] = deg2rad(-3); // E1
-	qmax[3] = deg2rad(150);
+	qmin[3] = deg2rad(-93); // E1
+	qmax[3] = deg2rad(60);
 	qmin[4] = deg2rad(-175.25); // W0 - Flip for Arm 2
 	qmax[4] = deg2rad(175.25);
 	qmin[5] = deg2rad(-90); // W1
