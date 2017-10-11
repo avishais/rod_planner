@@ -129,7 +129,7 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::walk_on_PRM(TreeData &
 // nmotion - nearest
 // target_index - index of the target subms node in the PRM 
 {
-	State q_target(12), a_dummy(6), q1_target(6), q2_target(6);
+	State q_target(nq), a_dummy(na);
 	
 	double maxDistance = 0.2;
 
@@ -173,8 +173,7 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::walk_on_PRM(TreeData &
 
 		// Check collision
 		Matrix P = path[i].index_indicator ? ms.P[path[i].index] : subms.P[path[i].index];
-		seperate_Vector(q_target, q1_target, q2_target);
-		if (collision_state(P, q1_target, q2_target))
+		if (collision_state(P, q_target))
 			break;
 		/*if (!(no_collision_count % collision_buffer)) {
 			Matrix P = path[i].index_indicator ? ms.P[path[i].index] : subms.P[path[i].index];
@@ -215,6 +214,16 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::walk_on_PRM(TreeData &
 
 ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerminationCondition &ptc)
 {
+	/*{
+		const base::State *st1 = pis_.nextStart();
+		const base::State *st2 = pis_.nextGoal();
+		log_q(st1);
+		cout << "..\n";
+		cin.ignore();
+		log_q(st2);
+		exit(1);
+	}*/
+
 	initiate_log_parameters();
 
 	// Load roadmap from .prm file
@@ -226,7 +235,7 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	int subms_size = subms.sub_milestones.size();
 	OMPL_INFORM("%s: Loaded PRM with %d milestones and %d sub-milestones", getName().c_str(), ms_size, subms_size);
 
-	State a(6), as(6), ag(6);
+	State a(na), as(na), ag(na);
 
 	checkValidity(); 
 	
@@ -491,7 +500,7 @@ void ompl::geometric::CBiRRT::save2file(vector<Motion*> mpath1, vector<Motion*> 
 	cout << "Logging path to files..." << endl;
 	//return;
 
-	State a(6), q(12);
+	State a(na), q(nq);
 	int active_chain, ik_sol;
 
 	{
@@ -507,9 +516,9 @@ void ompl::geometric::CBiRRT::save2file(vector<Motion*> mpath1, vector<Motion*> 
 		State temp;
 		for (int i = mpath1.size() - 1 ; i >= 0 ; --i) {
 			retrieveStateVector(mpath1[i]->state, a, q);
-			for (int j = 0; j<12; j++)
+			for (int j = 0; j < nq; j++)
 				myfile << q[j] << " ";
-			for (int j = 0; j<6; j++)
+			for (int j = 0; j < na; j++)
 				afile << a[j] << " ";
 			myfile << endl;
 			afile << endl;
@@ -524,9 +533,9 @@ void ompl::geometric::CBiRRT::save2file(vector<Motion*> mpath1, vector<Motion*> 
 		}
 		for (unsigned int i = 0 ; i < mpath2.size() ; ++i) {
 			retrieveStateVector(mpath2[i]->state, a, q);
-			for (int j = 0; j<12; j++)
+			for (int j = 0; j < nq; j++)
 				myfile << q[j] << " ";
-			for (int j = 0; j<6; j++)
+			for (int j = 0; j < na; j++)
 				afile << a[j] << " ";
 			myfile << endl;
 			afile << endl;

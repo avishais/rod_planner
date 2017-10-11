@@ -31,6 +31,8 @@ int main() {
 	collisionDetection C;
 
 	State a = {1.13317, -4.08401, 2.74606, 6.78602, 11.6337, -5.10359};
+	//State a = {-0.228674, -5.79388, 0.376973, -12.1839, 0.804729, 7.27214};
+	//State a = {0, 3.5, 0, 0, 0, 0};
 	R.rod_solve(a);
 	Matrix T = R.getT(R.get_Points_on_Rod()-1);
 	K.printMatrix(T);
@@ -63,9 +65,11 @@ int main() {
 			//cout << "Failed.\n";
 			continue;
 		}
-		q = K.get_GD_result();
-		if (!C.collision_state(R.getPMatrix(), q))
-			break;
+		else {
+			q = K.get_GD_result();
+			if (!C.collision_state(R.getPMatrix(), q))
+				break;
+		}
 	}
 	K.FK(q, T);
 	K.printMatrix(K.get_FK_solution());
@@ -79,5 +83,15 @@ int main() {
 	myfile.close();
 
 	cout << C.collision_state(R.getPMatrix(), q) << endl;
+
+	cout << "{";
+	for (int i = 0; i < 6; i++)
+		cout << q[i] << ", ";
+	for (int i = 0; i < 14; i++) {
+		cout << q[i];
+		if (i<13)
+			 cout << ", ";
+	}
+	cout << "};\n";
 }
 

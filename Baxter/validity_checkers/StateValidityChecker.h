@@ -31,26 +31,11 @@ class StateVector {
 public:
 	StateVector(int num) {
 		n = num;
-		q1.resize(n);
-		q2.resize(n);
-		q.resize(2*n);
+		q.resize(n);
 		a.resize(6);
 	}
 
-	void copy(State aa, State qq1, State qq2) {
-		q1 = qq1;
-		q2 = qq2;
-		for (int i = 0; i < n; i++) {
-			q[i] = qq1[i];
-			q[i+6] = qq2[i];
-		}
-		a = aa;
-	}
 	void copy(State aa, State qq) {
-		for (int i = 0; i < n; i++) {
-			q1[i] = qq[i];
-			q2[i] = qq[i+6];
-		}
 		q = qq;
 		a = aa;
 	}
@@ -67,8 +52,6 @@ public:
 	}
 
 	int n;
-	State q1;
-	State q2;
 	State q;
 	State a;
 };

@@ -47,7 +47,7 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 	// construct the state space we are planning in
 	ob::CompoundStateSpace *cs = new ob::CompoundStateSpace(); // Compound R^12 configuration space
 	ob::StateSpacePtr A(new ob::RealVectorStateSpace(6)); // A-space - state space of the rod - R^6
-	ob::StateSpacePtr Q(new ob::RealVectorStateSpace(12)); // Angles of Robot 1 & 2 - R^12
+	ob::StateSpacePtr Q(new ob::RealVectorStateSpace(14)); // Angles of Robot 1 & 2 - R^12
 	cs->addSubspace(A, 1.0);
 	cs->addSubspace(Q, 1.0);
 
@@ -57,31 +57,39 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 	Abounds.setHigh(30);
 
 	// set the bounds for the Q=R^12 part of 'Cspace'
-	ob::RealVectorBounds Qbounds(12);
-	Qbounds.setLow(0, -2.88); // Robot 1
-	Qbounds.setHigh(0, 2.88);
-	Qbounds.setLow(1, -1.919);
-	Qbounds.setHigh(1, 1.919);
-	Qbounds.setLow(2, -1.919);
-	Qbounds.setHigh(2, 1.22);
-	Qbounds.setLow(3, -2.79);
-	Qbounds.setHigh(3, 2.79);
-	Qbounds.setLow(4, -2.09);
-	Qbounds.setHigh(4, 2.09);
-	Qbounds.setLow(5, -PI);// -6.98); // Should be -6.98 but currently the IK won't allow it - this impacts the sampler
-	Qbounds.setHigh(5, PI);// 6.98); // Should be 6.98 but currently the IK won't allow it
-	Qbounds.setLow(6, -2.88); // Robot 2
-	Qbounds.setHigh(6, 2.88);
-	Qbounds.setLow(7, -1.919);
-	Qbounds.setHigh(7, 1.919);
-	Qbounds.setLow(8, -1.919);
-	Qbounds.setHigh(8, 1.22);
-	Qbounds.setLow(9, -2.79);
-	Qbounds.setHigh(9, 2.79);
-	Qbounds.setLow(10, -2.09);
-	Qbounds.setHigh(10, 2.09);
-	Qbounds.setLow(11, -PI);// -6.98); // Should be -6.98 but currently the IK won't allow it
-	Qbounds.setHigh(11, PI);// 6.98); // Should be 6.98 but currently the IK won't allow it
+	ob::RealVectorBounds Qbounds(14);
+	Qbounds.setLow(0, -2.461); // S0
+	Qbounds.setHigh(0, 0.89);
+	Qbounds.setLow(1, -2.147); // S1
+	Qbounds.setHigh(1, +1.047);
+	Qbounds.setLow(2, -3.028); // E0
+	Qbounds.setHigh(2, +3.028);
+	Qbounds.setLow(3, -1.6232); // E1
+	Qbounds.setHigh(3, 1.0472);
+	Qbounds.setLow(4, -3.059); // W0
+	Qbounds.setHigh(4, 3.059);
+	Qbounds.setLow(5, -1.571); // W1
+	Qbounds.setHigh(5, 2.094);
+	Qbounds.setLow(6, -3.059); // W2
+	Qbounds.setHigh(6, 3.059);
+	// Left arm
+	//Qbounds.setLow(7, -0.89); // S0
+	//Qbounds.setHigh(7, 2.461);
+	Qbounds.setLow(7, -2.462); // S0
+	Qbounds.setHigh(7, 0.89);
+
+	Qbounds.setLow(8, -2.147); // S1
+	Qbounds.setHigh(8, +1.047);
+	Qbounds.setLow(9, -3.028); // E0
+	Qbounds.setHigh(9, +3.028);
+	Qbounds.setLow(10, -1.6232); // E1
+	Qbounds.setHigh(10, 1.0472);
+	Qbounds.setLow(11, -3.059); // W0
+	Qbounds.setHigh(11, 3.059);
+	Qbounds.setLow(12, -1.571); // W1
+	Qbounds.setHigh(12, 2.094);
+	Qbounds.setLow(13, -3.059); // W2
+	Qbounds.setHigh(13, 3.059);
 
 	// set the bound for the compound space
 	cs->as<ob::RealVectorStateSpace>(0)->setBounds(Abounds);
@@ -104,14 +112,14 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 	ob::ScopedState<ob::CompoundStateSpace> start(Cspace);
 	for (int i = 0; i < 6; i++)
 		start->as<ob::RealVectorStateSpace::StateType>(0)->values[i] = c_start[i]; // Access the first component of the start a-state
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < c_start.size()-6; i++)
 		start->as<ob::RealVectorStateSpace::StateType>(1)->values[i] = c_start[i+6];
 
 	// create goal state
 	ob::ScopedState<ob::CompoundStateSpace> goal(Cspace);
 	for (int i = 0; i < 6; i++)
 		goal->as<ob::RealVectorStateSpace::StateType>(0)->values[i] = c_goal[i]; // Access the first component of the goal a-state
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < c_goal.size()-6; i++)
 		goal->as<ob::RealVectorStateSpace::StateType>(1)->values[i] = c_goal[i+6];
 
 	// create a problem instance
@@ -212,9 +220,9 @@ int main(int argn, char ** args) {
 	vector<double> load_time = {10, 16};
 
 	State c_start, c_goal;
-	if (env == 1) { // Example - with pole obstacles
-		c_start = {1.13317, -4.08401, 2.74606, 6.786018, 11.63367, -5.103594, -0.209439510239320, 0.122173047639603,	0.174532925199433, 1.30899693899575, 0.261799387799149, 0.698131700797732, -0.106584015572764, 1.06335198985049, 0.282882132165777, -0.115210802424076, -1.95829181139617, -1.35961844319303};
-		c_goal = {1.8708,-1.3245,2.944,3.7388,6.5021,-0.01924,0.4,0.3,1,-0.1,-0.57118,-0.4,-0.84385,0.73392,0.2169,0.52291,-1.1915,2.6346};
+	if (env == 1) { // Example 1
+		c_start = {-0.228674, -5.79388, 0.376973, -12.1839, 0.804729, 7.27214, -0.350352, -1.5366, 2.87881, -0.453977, -1.50315, 1.44179, -0.604059, -0.429175, -1.34472, 1.10585, -0.78678, 2.76589, -0.860165, -1.67489};
+		c_goal = {1.13317, -4.08401, 2.74606, 6.78602, 11.6337, -5.10359, 0.862361, -0.234115, -2.1993, -0.763042, 2.05378, 0.149986, 2.24325, 0.615206, -0.584064, -1.06856, -1.15379, 1.68501, -0.847547, -1.82553};
 	}
 	else if (env == 2) {
 

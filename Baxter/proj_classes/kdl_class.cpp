@@ -161,14 +161,12 @@ bool kdl::GD(State q_init_flip, Matrix Q) {
 bool kdl::check_angle_limits(State q) {
 
 	// Arm 1
-	if (q[0] < qmin[0] || q[0] > qmax[0])
-		return false;
-	for (int i = 1; i < 7; i++)
+	for (int i = 0; i < 7; i++)
 		if (q[i] < qmin[i] || q[i] > qmax[i])
 			return false;
 
 	// Arm 2
-	if (q[7] < qmin[0] || q[7] > qmax[0])
+	if (q[7] < -qmax[0] || q[7] > -qmin[0])
 		return false;
 	for (int i = 8; i < q.size(); i++)
 		if (q[i] < qmin[i-7] || q[i] > qmax[i-7])
@@ -193,7 +191,6 @@ void kdl::FK(State q, Matrix Q) {
 		q_flip[j] = q[i];
 	q_flip[13] = -q_flip[13];
 	q = q_flip;
-	printVector(q);
 
 	// Initiate chain with given rod configuration
 	KDL::Chain chain;

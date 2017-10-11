@@ -506,7 +506,7 @@ int collisionDetection::collision_state(Matrix M, State q)
 
 
 		// Wall
-		MRotZ(Rwall,0*3.1415926/180);
+		/*MRotZ(Rwall,0*3.1415926/180);
 		//Twall[0] = 980; Twall[1] = -125; Twall[2] = 50;
 		Twall[0] = 1010; Twall[1] = -20; Twall[2] = 170;
 
@@ -518,7 +518,7 @@ int collisionDetection::collision_state(Matrix M, State q)
 		PQP_Tolerance(&res[120],Rwall,Twall,&wall,R52,T52,&link52,tolerance);
 		PQP_Tolerance(&res[121],Rwall,Twall,&wall,R62,T62,&link62,tolerance);
 		PQP_Tolerance(&res[122],Rwall,Twall,&wall,R72,T72,&link72,tolerance);
-		PQP_Tolerance(&res[123],Rwall,Twall,&wall,Rrod_v,Trod,&rod,tolerance);
+		PQP_Tolerance(&res[123],Rwall,Twall,&wall,Rrod_v,Trod,&rod,tolerance);*/
 
 
 		// Obs1
@@ -536,7 +536,7 @@ int collisionDetection::collision_state(Matrix M, State q)
 		PQP_Tolerance(&res[122],Rwall,Twall,&obs,R72,T72,&link72,tolerance);
 		PQP_Tolerance(&res[123],Rwall,Twall,&obs,Rrod,Trod,&rod,tolerance);*/
 
-		num_links2check = 123;
+		num_links2check = 114;
 	}
 
 	clock_t end = clock();

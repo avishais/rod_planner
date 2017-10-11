@@ -230,9 +230,9 @@ void StateValidityChecker::log_q(const ob::State *st) {
 
 void StateValidityChecker::log_q(State a, State q) {
 	std::ofstream qfile, afile, pfile, ai;
-	qfile.open("../paths/path.txt");
-	afile.open("../paths/afile.txt");
-	pfile.open("../paths/rod_path.txt");
+	qfile.open("./paths/path.txt");
+	afile.open("./paths/afile.txt");
+	pfile.open("./paths/rod_path.txt");
 
 	qfile << 1 << endl;
 	pfile << 501 << endl;

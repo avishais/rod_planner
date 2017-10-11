@@ -29,6 +29,7 @@ PQP_REAL M5[3][3],M6[3][3],M7[3][3],M8[3][3],TEE[3],TEE2[3];
 
 int step;
 bool withObs = true;
+bool grasp_pose = true; // false - rod is grasped such that it is continuous to the arm, true - rod is grasped perpendicular to the gripper plane
 
 double oglm[16];
 
@@ -759,7 +760,6 @@ void DisplayCB()
 	VpV(Trod,Trod,TEE);
 
 	double pose_angle;
-	bool grasp_pose = true; // false - rod is grasped such that it is continuous to the arm, true - rod is grasped perpendicular to the gripper plane
 	if (!grasp_pose)
 		pose_angle = -3.1415926/2; // Continuous to the arm
 	else
@@ -850,7 +850,7 @@ void DisplayCB()
 		glPopMatrix();*/
 
 		// Wall
-		MRotZ(R0,0*3.1415926/180);
+		/*MRotZ(R0,0*3.1415926/180);
 		Ti[0] = 1010; Ti[1] = -20; Ti[2] = 170;
 		//Ti[0] = 980; Ti[1] = -125; Ti[2] = 50;
 		glColor3d(1.0,0.0,0.0);
@@ -858,7 +858,7 @@ void DisplayCB()
 		glPushMatrix();
 		glMultMatrixd(oglm);
 		wall_to_draw->Draw();
-		glPopMatrix();
+		glPopMatrix();*/
 
 	}
 

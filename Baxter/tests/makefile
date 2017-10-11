@@ -32,7 +32,7 @@ CPP = $(INC_CLASSES)kdl_class.cpp
 all:
 	#${CXX} ${CPP_PLN} ${CPP_PRM} ${CPPPQP} -o pln ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
 	#${CXX} test_kdl.cpp ${CPP} ${CPP_PRM} -o tst ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
-	#${CXX} test_collision.cpp ${CPP} ${CPP_PRM} ${CPPPQP} -o tcl ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
-	$(CXX) test_sample.cpp ${CPP_PRM} ${CPP_ROB} ${CPPPQP} -o tsmp $(CXXFLAGS) $(LDFLAGS) -std=c++11	
+	${CXX} test_collision.cpp ${CPP} ${CPP_PRM} ${CPPPQP} -o tcl ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
+	#$(CXX) test_sample.cpp ${CPP_PRM} ${CPP_ROB} ${CPPPQP} -o tsmp $(CXXFLAGS) $(LDFLAGS) -std=c++11	
 
 
