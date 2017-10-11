@@ -31,6 +31,6 @@ CPP = $(INC_CLASSES)kdl_class.cpp
 
 all:
 	#${CXX} ${CPP_PLN} ${CPP_PRM} ${CPPPQP} -o pln ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
-	${CXX} test_kdl.cpp ${CPP} ${CPP_PRM} -o tst ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
+	${CXX} test_kdl.cpp ${CPP} -o tst ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
 
 

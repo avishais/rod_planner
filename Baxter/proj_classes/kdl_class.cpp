@@ -47,7 +47,7 @@ kdl::kdl(double D) {
 	jointpositions = JntArray(nj);
 	initVector(q_solution, nj);
 
-	grasp_pose = false;
+	grasp_pose = true;
 
 	cout << "Initiated chain with " << nj << " joints.\n";
 }
@@ -82,15 +82,15 @@ bool kdl::GD(State q_init_flip, Matrix Q) {
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(l6b,0.0,-l6a))));
 	chain.addSegment(Segment(Joint(Joint::RotY),Frame(Vector(l7,0.0,0.0))));
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(lEE,0.0,0.0))));
-	//if (grasp_pose)
-	//	chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
+	if (grasp_pose)
+		chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
 	// Rod
 	Rotation r( Q[0][0],Q[0][1],Q[0][2], Q[1][0],Q[1][1],Q[1][2], Q[2][0],Q[2][1],Q[2][2] );
 	chain.addSegment(Segment(Joint(Joint::None),Frame(Vector(Q[0][3],Q[1][3],Q[2][3])))); // Rod translation
 	chain.addSegment(Segment(Joint(Joint::None),Frame(r))); // Rod rotation
 	// Arm 2
-	//if (grasp_pose)
-	//	chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
+	if (grasp_pose)
+		chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
 	chain.addSegment(Segment(Joint(Joint::None),Frame(Vector(lEE,0.0,0.0))));
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(l7,0.0,0.0))));
 	chain.addSegment(Segment(Joint(Joint::RotY),Frame(Vector(l6b,0.0,l6a))));
@@ -206,15 +206,15 @@ void kdl::FK(State q, Matrix Q) {
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(l6b,0.0,-l6a))));
 	chain.addSegment(Segment(Joint(Joint::RotY),Frame(Vector(l7,0.0,0.0))));
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(lEE,0.0,0.0))));
-	//if (grasp_pose)
-	//	chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
+	if (grasp_pose)
+		chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
 	// Rod
 	Rotation r( Q[0][0],Q[0][1],Q[0][2], Q[1][0],Q[1][1],Q[1][2], Q[2][0],Q[2][1],Q[2][2] );
 	chain.addSegment(Segment(Joint(Joint::None),Frame(Vector(Q[0][3],Q[1][3],Q[2][3])))); // Rod translation
 	chain.addSegment(Segment(Joint(Joint::None),Frame(r))); // Rod rotation
 	// Arm 2
-	//if (grasp_pose)
-	//	chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
+	if (grasp_pose)
+		chain.addSegment(Segment(Joint(Joint::None),Frame(Rotation(0,0,1,0,1,0,-1,0,0)))); // EE - grasp non-continuous to the arm
 	chain.addSegment(Segment(Joint(Joint::None),Frame(Vector(lEE,0.0,0.0))));
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(l7,0.0,0.0))));
 	chain.addSegment(Segment(Joint(Joint::RotY),Frame(Vector(l6b,0.0,l6a))));

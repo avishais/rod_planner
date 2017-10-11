@@ -759,14 +759,18 @@ void DisplayCB()
 	VpV(Trod,Trod,TEE);
 
 	double pose_angle;
-	bool grasp_pose = true; // true - rod is grasped such that it is continuous to the arm, false - rod is grasped perpendicular to the gripper plane
-	if (grasp_pose)
+	bool grasp_pose = true; // false - rod is grasped such that it is continuous to the arm, true - rod is grasped perpendicular to the gripper plane
+	if (!grasp_pose)
 		pose_angle = -3.1415926/2; // Continuous to the arm
 	else
-		pose_angle = 0; // Perpendicular to the gripper plane
+		pose_angle = 3.1415926; // Perpendicular to the gripper plane - Add this to collisionChecker!!!!!
 
 	MRotY(Mrod,pose_angle);
 	MxM(Rrod, REE, Mrod);
+
+	// Fix based on updated kinematics in kdl_class.cpp from 10/10/2017 - Add this to collisionChecker!!!!!
+	MRotX(Mrod,-3.1415926);
+	MxM(REE, Rrod, Mrod);
 
 	//pm(REE, "Ree");
 	//pm(Rrod, "Rrod");
@@ -781,7 +785,7 @@ void DisplayCB()
 		P[2]=RodStates[step1][i][2];
 
 		//MxVpV(V,Rrod,P,TEE);
-		MxVpV(V,Rrod,P,Trod);
+		MxVpV(V,REE,P,Trod); // <--- Changed this also on 10/10/2017
 		//glColor3d(.93, .69, .13);//.93, .69, .13);//
 		glColor3d(1.0, 1.0, 1.0);//.93, .69, .13);//
 		glPushMatrix();
@@ -808,7 +812,7 @@ void DisplayCB()
 	MRotX(Mclp,-3.1415926/2);
 	MxM(Rclp2, REE2, Mclp);
 
-	if (!grasp_pose) {
+	if (grasp_pose) {
 		MRotZ(Mclp,-3.1415926/2);
 		MxM(MInt, Rclp2, Mclp);
 		MRotX(Mclp,0);
