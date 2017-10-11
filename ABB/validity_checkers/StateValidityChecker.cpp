@@ -26,9 +26,9 @@ void StateValidityChecker::retrieveStateVector(const ob::State *state, State &a,
 	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
 	const ob::RealVectorStateSpace::StateType *Q = C_state->as<ob::RealVectorStateSpace::StateType>(1);
 
-	for (unsigned i = 0; i < 6; i++)
+	for (unsigned i = 0; i < na; i++)
 		a[i] = A->values[i]; // Get state of rod
-	for (unsigned i = 0; i < 12; i++)
+	for (unsigned i = 0; i < nq; i++)
 		q[i] = Q->values[i]; // Get state of robots
 }
 
@@ -37,7 +37,7 @@ void StateValidityChecker::retrieveStateVector(const ob::State *state, State &a)
 	const ob::CompoundStateSpace::StateType *C_state = state->as<ob::CompoundStateSpace::StateType>();
 	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
 
-	for (unsigned i = 0; i < 6; i++)
+	for (unsigned i = 0; i < na; i++)
 		a[i] = A->values[i]; // Get state of rod
 }
 
@@ -47,10 +47,11 @@ void StateValidityChecker::retrieveStateVector(const ob::State *state, State &a,
 	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
 	const ob::RealVectorStateSpace::StateType *Q = C_state->as<ob::RealVectorStateSpace::StateType>(1);
 
-	for (unsigned i = 0; i < 6; i++) {
+	for (unsigned i = 0; i < na; i++)
 		a[i] = A->values[i]; // Set state of rod
+	for (unsigned i = 0; i < nq/2; i++) {
 		q1[i] = Q->values[i]; // Set state of robot1
-		q2[i] = Q->values[i+6]; // Set state of robot1
+		q2[i] = Q->values[i+nq/2]; // Set state of robot1
 	}
 }
 
@@ -60,10 +61,10 @@ void StateValidityChecker::updateStateVector(const ob::State *state, State a, St
 	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
 	const ob::RealVectorStateSpace::StateType *Q = C_state->as<ob::RealVectorStateSpace::StateType>(1);
 
-	for (unsigned i = 0; i < 6; i++)
+	for (unsigned i = 0; i < na; i++)
 		A->values[i] = a[i];
 
-	for (unsigned i = 0; i < 12; i++)
+	for (unsigned i = 0; i < nq; i++)
 		Q->values[i] = q[i];
 }
 
@@ -73,10 +74,11 @@ void StateValidityChecker::updateStateVector(const ob::State *state, State a, St
 	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
 	const ob::RealVectorStateSpace::StateType *Q = C_state->as<ob::RealVectorStateSpace::StateType>(1);
 
-	for (unsigned i = 0; i < 6; i++) {
+	for (unsigned i = 0; i < na; i++)
 		A->values[i] = a[i];
+	for (unsigned i = 0; i < nq/2; i++) {
 		Q->values[i] = q1[i];
-		Q->values[i+6]= q2[i];
+		Q->values[i+nq/2]= q2[i];
 	}
 }
 
@@ -85,7 +87,7 @@ void StateValidityChecker::updateStateVector(const ob::State *state, State a) {
 	const ob::CompoundStateSpace::StateType *C_state = state->as<ob::CompoundStateSpace::StateType>();
 	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
 
-	for (unsigned i = 0; i < 6; i++)
+	for (unsigned i = 0; i < na; i++)
 		A->values[i] = a[i];
 }
 
@@ -95,12 +97,13 @@ void StateValidityChecker::printStateVector(const ob::State *state) {
 	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
 	const ob::RealVectorStateSpace::StateType *Q = C_state->as<ob::RealVectorStateSpace::StateType>(1);
 
-	State a(6), q1(6), q2(6);
+	State a(na), q1(nq/2), q2(nq/2);
 
-	for (unsigned i = 0; i < 6; i++) {
+	for (unsigned i = 0; i < na; i++)
 		a[i] = A->values[i]; // Set state of rod
+	for (unsigned i = 0; i < nq/2; i++) {
 		q1[i] = Q->values[i]; // Set state of robot1
-		q2[i] = Q->values[i+6]; // Set state of robot1
+		q2[i] = Q->values[i+nq/2]; // Set state of robot1
 	}
 
 	cout << "a: "; kdl::printVector(a);
@@ -188,12 +191,12 @@ bool StateValidityChecker::APCproject(State a, State &q1, State &q2, int &active
 
 bool StateValidityChecker::APCsample(ob::State *st) {
 
-	State a(6), q(12), q1(6), q2(6), ik(2);
+	State a(na), q(nq), q1(nq/2), q2(nq/2), ik(2);
 
 	bool flag = true;
 	while (flag) {
 		// Random rod configuration
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < na; i++)
 			a[i] = ((double) rand() / (RAND_MAX)) * 2 * 30 - 30;
 		if (!isRodFeasible(a))
 			continue;
@@ -206,7 +209,7 @@ bool StateValidityChecker::APCsample(ob::State *st) {
 			if (withObs)
 				q1 = rand_q(6);
 			else
-				for (int i = 0; i < 6; i++)
+				for (int i = 0; i < nq/2; i++)
 					q1[i] = ((double) rand() / (RAND_MAX)) * 2 * PI_ - PI_;
 
 			int ik_sol = rand() % 8;
@@ -235,7 +238,7 @@ bool StateValidityChecker::APCsample(ob::State *st) {
 
 State StateValidityChecker::identify_state_ik(const ob::State *state) {
 
-	State a(6), q1(6), q2(6), ik(2);
+	State a(na), q1(nq/2), q2(nq/2), ik(2);
 	retrieveStateVector(state, a, q1, q2);
 
 	if (!isRodFeasible(a))
@@ -249,7 +252,7 @@ State StateValidityChecker::identify_state_ik(const ob::State *state) {
 
 State StateValidityChecker::identify_state_ik(const ob::State *state, Matrix Q) {
 
-	State q1(6), q2(6), ik(2);
+	State q1(nq/2), q2(nq/2), ik(2);
 	retrieveStateVector(state, q1, q2);
 
 	ik = identify_state_ik(q1, q2, Q);
@@ -302,7 +305,7 @@ State StateValidityChecker::identify_state_ik(State q1, State q2, Matrix Q) {
 
 bool StateValidityChecker::GDsample(ob::State *st) {
 
-	State a(6), q(12), q1(6), q2(6);
+	State a(na), q(nq), q1(nq/2), q2(nq/2);
 
 	if (!GDsample(a, q))
 		return false;
@@ -315,12 +318,12 @@ bool StateValidityChecker::GDsample(ob::State *st) {
 
 bool StateValidityChecker::GDsample(State &a, State &q) {
 
-	State q1(6), q2(6);
+	State q1(nq/2), q2(nq/2);
 
 	bool flag = true;
 	while (flag) {
 		// Random rod configuration
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < na; i++)
 			a[i] = ((double) rand() / (RAND_MAX)) * 2 * 30 - 30;
 		if (!isRodFeasible(a))
 			continue;
@@ -329,7 +332,7 @@ bool StateValidityChecker::GDsample(State &a, State &q) {
 		for (int k = 0; k < 10; k++) {
 
 			// Random joint angles
-			for (int i = 0; i < 12; i++)
+			for (int i = 0; i < nq; i++)
 				q[i] = ((double) rand() / (RAND_MAX)) * 2 * PI_ - PI_;
 
 			if (!GD(q, Q)) // GD checks for joint limits
@@ -351,7 +354,7 @@ bool StateValidityChecker::GDsample(State &a, State &q) {
 
 bool StateValidityChecker::GDproject(ob::State *st) {
 
-	State a(6), q(12);
+	State a(na), q(nq);
 
 	// Check that 'a' on the random state is feasible
 	retrieveStateVector(st, a, q);
@@ -368,7 +371,7 @@ bool StateValidityChecker::GDproject(ob::State *st) {
 
 bool StateValidityChecker::GDproject(State a, State &q) {
 
-	State q1(6), q2(6);
+	State q1(nq/2), q2(nq/2);
 
 	kdl::IK_counter++;
 	clock_t sT = clock();
@@ -396,7 +399,7 @@ bool StateValidityChecker::GDproject(State a, State &q) {
 
 bool StateValidityChecker::GDproject(State &q, Matrix Q) {
 
-	State q1(6), q2(6);
+	State q1(nq/2), q2(nq/2);
 
 	kdl::IK_counter++;
 	clock_t sT = clock();
@@ -418,7 +421,7 @@ bool StateValidityChecker::GDproject(State &q, Matrix Q) {
 // ---------------------------------------------------------------
 
 void StateValidityChecker::log_q(const ob::State *st) {
-	State a(6), q1(6), q2(6);
+	State a(na), q1(nq/2), q2(nq/2);
 
 	retrieveStateVector(st, a, q1, q2);
 	log_q(a, q1, q2);
@@ -433,13 +436,12 @@ void StateValidityChecker::log_q(State a, State q1, State q2) {
 	qfile << 1 << endl;
 	pfile << 501 << endl;
 
-	for (int j = 0; j < 6; j++) {
-		qfile << q1[j] << " ";
+	for (int j = 0; j < na; j++)
 		afile << a[j] << " ";
-	}
-	for (int j = 0; j<6; j++) {
+	for (int j = 0; j < nq/2; j++)
+		qfile << q1[j] << " ";
+	for (int j = 0; j < nq/2; j++)
 		qfile << q2[j] << " ";
-	}
 
 	rod_solve(a);
 	State temp(3);
@@ -465,11 +467,11 @@ void StateValidityChecker::log_q(Matrix A, Matrix M) {
 	pfile << M.size()*501 << endl;
 
 	for (int i = 0; i < M.size(); i++) {
-		for (int j = 0; j < 12; j++) {
+		for (int j = 0; j < nq; j++) {
 			qfile << M[i][j] << " ";
 
 		}
-		for (int j = 0; j < 6; j++) {
+		for (int j = 0; j < na; j++) {
 			afile << A[i][j] << " ";
 		}
 		qfile << endl;
@@ -521,8 +523,8 @@ void StateValidityChecker::seperate_Vector(State q, State &q1, State &q2) {
 
 double StateValidityChecker::StateDistance(const ob::State *s1, const ob::State *s2) {
 
-	State aa(6), qa1(6), qa2(6);
-	State ab(6), qb1(6), qb2(6);
+	State aa(na), qa1(nq/2), qa2(nq/2);
+	State ab(na), qb1(nq/2), qb2(nq/2);
 
 	retrieveStateVector(s1, aa, qa1, qa2);
 	retrieveStateVector(s2, ab, qb1, qb2);
@@ -536,12 +538,12 @@ double StateValidityChecker::StateDistance(const ob::State *s1, const ob::State 
 }
 
 double StateValidityChecker::AngleDistance(const ob::State *st1, const ob::State *st2) {
-	State q1(12), q2(12), a_dummy(6);
+	State q1(nq), q2(nq), a_dummy(na);
 	retrieveStateVector(st1, a_dummy, q1);
 	retrieveStateVector(st2, a_dummy, q2);
 
 	double sum = 0;
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < nq; i++)
 		sum += pow(q1[i]-q2[i], 2);
 	return sqrt(sum);
 }
@@ -613,7 +615,7 @@ bool StateValidityChecker::check_angles_offset(State qn, State q) {
 
 bool StateValidityChecker::check_angles_offset(ob::State *nstate, State q) {
 
-	State qn(q.size()), a(6);
+	State qn(q.size()), a(na);
 
 	retrieveStateVector(nstate, a, qn);
 
@@ -641,7 +643,7 @@ bool StateValidityChecker::check_rigid_motion(const ob::State *st1, const ob::St
 
 	// temporary storage for the checked state
 	ob::State *test = mysi_->allocState();
-	State a_dummy(6), q(12), q1(6), q2(6), q_prev(12);
+	State a_dummy(na), q(nq), q1(nq/2), q2(nq/2), q_prev(nq);
 	retrieveStateVector(st1, a_dummy, q_prev);
 
 	bool valid = true;

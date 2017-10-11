@@ -197,6 +197,8 @@ public:
 
 	void LogPerf2file();
 
+	int na = 6; // Dimension of rod conf. space
+	int nq = 12; // Dimension of robots joint space
 
 private:
 	ob::StateSpace *stateSpace_;
@@ -212,7 +214,6 @@ private:
 	double RBS_max_depth = 100;
 
 	Matrix q_rigid_path;
-
 };
 
 
