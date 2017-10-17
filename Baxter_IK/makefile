@@ -1,8 +1,8 @@
 
 
 OMPL_DIR = /usr/local
-INC_CLASSES = /home/avishai/Downloads/omplapp/ompl/Workspace/precomputation/Baxter/classes/
-ROD_CLASSES = /home/avishai/Downloads/omplapp/ompl/Workspace/precomputation/roadmap/
+INC_CLASSES = ./classes/
+ROD_CLASSES = ../roadmap/
 
 KDL_DIR = /usr/local
 EIGEN_DIR = /home/avishai/Documents/eigen
@@ -23,7 +23,7 @@ CPP_ADD3 =  $(ROD_CLASSES)prm_gen.cpp $(ROD_CLASSES)/classes/Rod_ODE_class.cpp $
 CPPPQP2 = ${INC_CLASSES}collisionDetection.cpp ${INC_CLASSES}model.cpp
 
 all:
-	#${CXX} plan.cpp ${CPP_ADD4} ${CPPPQP2} -o plan ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
+	${CXX} plan.cpp ${CPP_ADD4} ${CPPPQP2} -o plan ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
 	#$(CXX) smooth.cpp $(CPP_ADD3) $(CPPPQP2) -o smo $(CXXFLAGS) $(LDFLAGS) -std=c++11 #-Wall
-	$(CXX) fillpath.cpp $(CPP_ADD3) $(CPPPQP2) -o fill $(CXXFLAGS) $(LDFLAGS) -std=c++11 #-Wall
+	#$(CXX) fillpath.cpp $(CPP_ADD3) $(CPPPQP2) -o fill $(CXXFLAGS) $(LDFLAGS) -std=c++11 #-Wall
 	

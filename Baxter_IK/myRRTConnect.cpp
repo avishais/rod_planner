@@ -254,37 +254,59 @@ ompl::base::PlannerStatus ompl::geometric::RRTConnect::solve(const base::Planner
 {
 	// -------- Temp --------
 
-	/*const base::State *st = pis_.nextGoal();
+	const base::State *st = pis_.nextGoal();
 	State aa(6), qq1(Nj), qq2(Nj);
-	printStateVector(st);
+	//printStateVector(st);
 
-	ifstream fq;
-	fq.open("./path/robot_paths.txt");
-	int t;
-	fq >> t;
+	// Start
+	aa =  { 0, -4.6, 0, 0, 0, 0};
+	qq1 = {0, -0.2, 0, -1, -1.7, -1.4, 0};
+	qq2 = {0.4, -0.6, 0, -0.4, 0, 0, 0};
+	//c_start = {0, -4.6, 0, 0, 0, 0, 0, -0.1, 0, -1, -1.5, -1.4, -0.5, 1.61661, 0.494671, -1.15783, 0.499994, 0.968899, -0.318459, 2.78032};
 
-	// Option 1
-	aa =  { 0, 3.5, 0, 0, 0, 0};
-	//q = {0, -0.45, -0.1, 0.3, 0, -1.4, -1.5, -0.22298, -0.443116, -0.00200849, 0.436657, -0.544159, -1.54183, 1.56446};
+	/*aa =  { 2.3, -5.5, 0, 0, 0, 0};
+	qq1 = {-0.8, -1.2, 0.8, 0.6, -2.6, 0.7, 0}; //-0.8 -0.8 0.8 0.7 -2.6 1 0.2
+	qq2 = {0, -0.294859, -1.29833, -0.5, -0.000638515, -0.485917, 2.675};
+	//c_goal = {2.3, -5.5, 0, 0, 0, 0, -0.9, -0.9, 0.8, 0.7, -2.6, 0.9, -0.3, -0.176201, -0.610284, -0.57566, -0.603606, 2.87572, -0.0423817, -2.10024};
+	*/
 
-	for (int j=0; j < 7; j++)
-		fq >> qq1[j];
-	for (int j=0; j < 7; j++)
-		fq >> qq2[j];
+	int c = 0, index;
+	do {
 
-	updateStateVector(st, aa, qq1, qq2);
-	int c = 0;
-	while (!close_chain(st, 0) && c < 10)
+		updateStateVector(st, aa, qq1, qq2);
+		close_chain(st, 0);
+
+		retrieveStateVector(st, aa, qq1, qq2);
+		//isRodFeasible(aa);
+		//cout << collision_state(getPMatrix(), qq1, qq2) << endl;
+
+		printStateVector(st);
+		saveState2file(st);
+
+		cout << "{";
+		for (int i = 0; i < 6; i++)
+			cout << aa[i] << ", ";
+		for (int i = 0; i < 7; i++)
+			cout << qq1[i] << ", ";
+		for (int i = 0; i < 7; i++) {
+			cout << qq2[i];
+			if (i < 6)
+				cout << ", ";
+		}
+		cout << "}" << endl;
+
+		cout << "------------------------------------\n";
+		cout << "Current q1: "; printVector(qq1);
+		cout << "Joint index [0-6]...";
+		cin >> index;
+		cout << "Current angle is " << qq1[index] << ", enter new angle...";
+		cin >> qq1[index];
+
 		c++;
+	} while (c < 100);
 
-	retrieveStateVector(st, aa, qq1, qq2);
-	isRodFeasible(aa);
-	cout << collision_state(getPMatrix(), qq1, qq2) << endl;
 
-	printStateVector(st);
-	saveState2file(st);
-
-	return base::PlannerStatus::EXACT_SOLUTION;*/
+	return base::PlannerStatus::EXACT_SOLUTION;
 
 
 	// ======================================

@@ -173,6 +173,10 @@ public:
 		return isValid_counter;
 	}
 
+	double get_RBS_tol() {
+		return RBS_tol;
+	}
+
 	// Performance parameters and handle
 	double total_runtime; // Total planning time
 	clock_t startTime; // Start clock
@@ -210,7 +214,7 @@ private:
 	State q1_prev, q2_prev;
 
 	bool withObs = true; // Include obstacles?
-	double RBS_tol = 0.1;
+	double RBS_tol = 0.2;
 	double RBS_max_depth = 100;
 
 	Matrix q_rigid_path;

@@ -344,8 +344,7 @@ double StateValidityChecker::AngleDistance(const ob::State *st1, const ob::State
 	return sqrt(sum);
 }
 
-
-// ====================== Check validity ===============================
+// ============================= Check validity =============================
 
 // Validates a state by computing the passive chain based on a specific IK solution (input) and checking collision
 bool StateValidityChecker::isValid(StateVector &S) {

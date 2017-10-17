@@ -46,7 +46,7 @@ void o(T a) {
 	cout << a << endl;
 }
 
-ompl::geometric::CBiRRT::CBiRRT(const base::SpaceInformationPtr &si, string PRMfile, int sNg_nn, int iter_bound_num) : base::Planner(si, "CBiRRT"), StateValidityChecker(si)
+ompl::geometric::CBiRRT::CBiRRT(const base::SpaceInformationPtr &si, string PRMfile, int sNg_nn) : base::Planner(si, "CBiRRT"), StateValidityChecker(si)
 {
 	specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;
 	specs_.directed = true;
@@ -58,12 +58,8 @@ ompl::geometric::CBiRRT::CBiRRT(const base::SpaceInformationPtr &si, string PRMf
 
 	defaultSettings(); // Avishai
 
-	Range = 2; // As tested
-
 	prmfile = PRMfile;
 	sNg_k = sNg_nn;
-	iteration_limit = iter_bound_num;
-
 }
 
 ompl::geometric::CBiRRT::~CBiRRT()
@@ -277,27 +273,14 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	bool solved         = false;
 
 	int iteration_counter = 1;
-	//cout << "Start/goal neighbors will be added every " << iteration_limit << " iterations." <<endl;
 	//trees_distance = distanceBetweenTrees(tStart_, tGoal_);
+
 	while (ptc == false)
 	{
 		clock_t wStart = clock();
 		TreeData &tree      = startTree ? tStart_ : tGoal_;
 		startTree = !startTree;
 		TreeData &otherTree = startTree ? tStart_ : tGoal_;
-
-		/*if (!(iteration_counter % iteration_limit)) {
-				if (rng_.uniform01 () < 0.5) {
-					cout << "Adding a neighbor to the start node at iteration " << iteration_counter << "..." << endl;
-					add_neighbor_to_node(new_ms_indices[0]); // Add neighbor to start node
-				}
-				else {
-					cout << "Adding a neighbor to the goal node at iteration " << iteration_counter << "..." << endl;
-					add_neighbor_to_node(new_ms_indices[1]); // Add neighbor to goal node
-				}
-				//iteration_limit *= 1.5;
-		}
-		iteration_counter++;*/
 
 		//===================== Plan ==========================
 

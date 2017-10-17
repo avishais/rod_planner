@@ -22,13 +22,14 @@ Model *link1_to_draw2, *link2_to_draw2, *link3_to_draw2, \
 PQP_REAL R0[3][3],R1[3][3],R2[3][3],T0[3],T1[3],T2[3];
 PQP_REAL R3[3][3],R4[3][3],R5[3][3],T3[3],T4[3],T5[5];
 PQP_REAL R6[3][3],R7[3][3],T6[3],T7[3],T2_t[3],Ti[3];
-PQP_REAL R8[3][3],T8[3][3],TP[3],MP[3][3],REE[3][3],REE2[3][3];
+PQP_REAL R8[3][3],T8[3][3],TP[3],MP[3][3],REE[3][3],REE2[3][3], Rrod_v[3][3];
 
 PQP_REAL M0[3][3],M1[3][3],M2[3][3],M3[3][3],M4[3][3],Trod[3], Trod2[3];
 PQP_REAL M5[3][3],M6[3][3],M7[3][3],M8[3][3],TEE[3],TEE2[3];
 
 int step;
 bool withObs = true;
+bool grasp_pose = true; // false - rod is grasped such that it is continuous to the arm, true - rod is grasped perpendicular to the gripper plane
 
 double oglm[16];
 
@@ -51,7 +52,7 @@ Matrix_robo RoboStates;
 
 int mode;
 double beginx, beginy;
-double dis = 2300.0, azim = -30.0, elev = 38.0, swi = -120;//-115;
+double dis = 3000.0, azim = -30.0, elev = 38.0, swi = -120;//-115;
 double ddis = 700.0, dazim = 0.0, delev = 0.0;
 double rot1, rot2, rot3, rot4, rot5, rot6, rot12, rot22, rot23, rot32, rot42, rot52, rot62, rot7, rot72;
 int visualizeRobots = 1, visualize = 1;
@@ -759,14 +760,19 @@ void DisplayCB()
 	VpV(Trod,Trod,TEE);
 
 	double pose_angle;
-	bool grasp_pose = true; // true - rod is grasped such that it is continuous to the arm, false - rod is grasped perpendicular to the gripper plane
-	if (grasp_pose)
+	if (!grasp_pose)
 		pose_angle = -3.1415926/2; // Continuous to the arm
 	else
-		pose_angle = 0; // Perpendicular to the gripper plane
+		pose_angle = 3.1415926; // Perpendicular to the gripper plane
 
 	MRotY(Mrod,pose_angle);
 	MxM(Rrod, REE, Mrod);
+
+	MRotX(Mrod,-3.1415926);
+	MxM(Rrod_v, Rrod, Mrod);
+
+	//pm(Rrod_v, "Rrod_v");
+	//pv(Trod, "Trod");
 
 	//pm(REE, "Ree");
 	//pm(Rrod, "Rrod");
@@ -781,7 +787,7 @@ void DisplayCB()
 		P[2]=RodStates[step1][i][2];
 
 		//MxVpV(V,Rrod,P,TEE);
-		MxVpV(V,Rrod,P,Trod);
+		MxVpV(V,Rrod_v,P,Trod);
 		//glColor3d(.93, .69, .13);//.93, .69, .13);//
 		glColor3d(1.0, 1.0, 1.0);//.93, .69, .13);//
 		glPushMatrix();
@@ -836,20 +842,29 @@ void DisplayCB()
 		glPopMatrix();
 
 		// Obs 1
-		/*MRotZ(R0,0);
-		Ti[0] = 900; Ti[1] = -175; Ti[2] = -100;
+		MRotZ(R0,0);
+		Ti[0] = 900; Ti[1] = -500; Ti[2] = 20;
 		glColor3d(1.0,1.0,1.0);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
 		glMultMatrixd(oglm);
 		obs1_to_draw->Draw();
-		glPopMatrix();*/
+		glPopMatrix();
 
-		// Wall
-		MRotZ(R0,0*3.1415926/180);
-		Ti[0] = 1010; Ti[1] = -20; Ti[2] = 170;
-		//Ti[0] = 980; Ti[1] = -125; Ti[2] = 50;
-		glColor3d(1.0,0.0,0.0);
+		// Cone 1
+		MRotX(R0,0);
+		Ti[0] = 910; Ti[1] = 260; Ti[2] = 20;
+		glColor3d(1.0,1.0,1.0);
+		MVtoOGL(oglm,R0,Ti);
+		glPushMatrix();
+		glMultMatrixd(oglm);
+		wall_to_draw->Draw();
+		glPopMatrix();
+
+		// Cone 2
+		MRotX(R0,3.1415926);
+		Ti[0] = 910; Ti[1] = 260; Ti[2] = 380*2+80;
+		glColor3d(1.0,1.0,1.0);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -1362,10 +1377,10 @@ void load_models(){
 		fclose(fp);
 
 		// initialize wall
-		wall_to_draw = new Model("wall4s.tris");
+		wall_to_draw = new Model("cone.tris");
 
-		fp = fopen("wall4s.tris","r");
-		if (fp == NULL) { fprintf(stderr,"Couldn't open wall.tris\n"); exit(-1); }
+		fp = fopen("cone.tris","r");
+		if (fp == NULL) { fprintf(stderr,"Couldn't open cone.tris\n"); exit(-1); }
 		fscanf(fp,"%d",&ntris);
 
 		wall.BeginModel();

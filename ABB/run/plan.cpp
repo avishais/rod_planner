@@ -42,7 +42,7 @@ bool isStateValidC(const ob::State *state)
 	return true;
 }
 
-void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, int sNg_nn, int iter_bound_num) {
+void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, int sNg_nn) {
 
 	// construct the state space we are planning in
 	ob::CompoundStateSpace *cs = new ob::CompoundStateSpace(); // Compound R^12 configuration space
@@ -123,7 +123,7 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 
 	// create a planner for the defined space
 	// To add a planner, the #include library must be added above
-	ob::PlannerPtr planner(new og::CBiRRT(si, PRMfile, sNg_nn, iter_bound_num));
+	ob::PlannerPtr planner(new og::CBiRRT(si, PRMfile, sNg_nn));
 
 	// set the problem we are trying to solve for the planner
 	planner->setProblemDefinition(pdef);
@@ -173,7 +173,7 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 
 int main(int argn, char ** args) {
 	std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
-	double runtime, map_index, num_nn, iter_bound_num;
+	double runtime, map_index, num_nn;
 	int env = 1;
 
 	if (argn == 1)
@@ -184,32 +184,14 @@ int main(int argn, char ** args) {
 	if (argn>2) {
 		map_index = atoi(args[2]);
 		num_nn = atoi(args[3]);
-		iter_bound_num = atoi(args[4]);
 	}
 	else {
 		map_index = 1;
 		num_nn = 2;
-		iter_bound_num = 1e9;
 	}
 
 
 	plan_C Plan;
-
-	// PRM data
-	//vector<string> PRMfile = {"ms6D_100_2.prm", "ms6D_1000_2.prm","ms6D_2000_2.prm","ms6D_5000_2.prm"};
-	//vector<string> PRMfile = {"ms6D_100_2.prm", "ms6D_300_2.prm", "ms6D_750_2.prm", "ms6D_1000_2.prm","ms6D_1500_2.prm","ms6D_2000_2.prm"};
-	//vector<string> PRMfile = {"ms6D_100_3.prm", "ms6D_750_3.prm", "ms6D_1500_3.prm","ms6D_300_3.prm"};
-	//vector<double> load_time = {2, 4, 8, 9, 13, 13}; // Average time required to load the map
-
-	//vector<string> PRMfile = {"ms6D_100_2.prm","ms6D_100_3.prm","ms6D_100_4.prm","ms6D_100_5.prm","ms6D_100_6.prm"};
-	//vector<double> load_time = {1.5, 3, 3.5, 4, 5}; // Average time required to load the map
-	//vector<string> PRMfile = {"ms6D_500_2.prm","ms6D_500_3.prm","ms6D_500_4.prm","ms6D_500_5.prm","ms6D_500_6.prm"};
-	//vector<double> load_time = {4, 6.5, 10, 12, 15}; // Average time required to load the map
-	//vector<string> PRMfile = {"ms6D_1000_2.prm","ms6D_1000_3.prm","ms6D_1000_4.prm","ms6D_1000_5.prm","ms6D_100_2.prm","ms6D_100_3.prm","ms6D_100_4.prm","ms6D_100_5.prm","ms6D_100_6.prm"};
-	//vector<double> load_time = {8, 15, 16, 20,1.5, 3, 3.5, 4, 5}; // Average time required to load the map
-
-	vector<string> PRMfile = {"ms6D_500_4.prm", "ms6D_1000_4.prm"};
-	vector<double> load_time = {10, 16};
 
 	State c_start, c_goal;
 	if (env == 1) { // Example - with pole obstacles
@@ -220,30 +202,29 @@ int main(int argn, char ** args) {
 
 	}
 
-	int mode = 1;
+	int mode = 3;
 	switch (mode) {
 	case 1 : {
 		map_index = 0;
 		num_nn = 1;
-		iter_bound_num = 1e9;
-		Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
+		vector<string> PRMfile = {"ms6D_500_4.prm", "ms6D_1000_4.prm"};
+		Plan.plan(c_start, c_goal, runtime, PRMfile[map_index], num_nn);
 
 		break;
 	}
 	case 2 : { // Benchmark with the same scenario and PRMmaps over N trials
-		std::ofstream ft;
+		/*std::ofstream ft;
 		ft.open("./matlab/time_sameScenario_30_750_2.txt", ios::app);
 
 
 		map_index = 0;
 		num_nn = 2;
-		iter_bound_num = 1e9;
 		int N = 100;
 		for (int i = 0; i < N; i++) {
 			cout << "**************************************" << endl;
 			cout << "Completed " << (double)i/N*100 << "%." << endl;
 			cout << "**************************************" << endl;
-			Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
+			Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn);
 
 			// Log
 			ifstream FromFile;
@@ -255,36 +236,77 @@ int main(int argn, char ** args) {
 			ft << endl;
 		}
 		ft.close();
-		break;
+		break;*/
 	}
 	case 3 : { // Benchmark with the same scenario and different PRMmaps over N trials
-		vector<int> prmk = {2,3,4,5,6};
-		int k = 2;
-		iter_bound_num = 1e9;
+
+		vector<int> ms_size = {100, 500, 1000};
+		vector<int> knn_size = {2, 3, 4, 5, 6};
+		num_nn = 1;
+
 		std::ofstream ft;
+		ft.open("./matlab/Benchmark_poleScene.txt", ios::app);
 
-		for( int j = 2; j < 3/*PRMfile.size()*/; j++) {
+		int N = 100;
+		for (int i = 0; i < N; i++) {
 
-			int N = 100;
-			for (int i = 0; i < N; i++) {
-				cout << "**************************************" << endl;
-				cout << "Completed " << (double)i/N*100 << "%." << endl;
-				cout << "**************************************" << endl;
-				Plan.plan(c_start, c_goal, runtime+load_time[j], PRMfile[j], k, iter_bound_num);
+			for( int j = 0; j < ms_size.size(); j++) {
+				for (int k = 0; k < knn_size.size(); k++) {
 
-				// Log
-				ft.open("./matlab/time_poleScene_MS1000_new.txt", ios::app);
-				ft << prmk[j] << "\t";
-				ifstream FromFile;
-				FromFile.open("./paths/perf_log.txt");
-				string line;
-				while (getline(FromFile, line))
-					ft << line << "\t";
-				FromFile.close();
-				ft << endl;
-				ft.close();
+					if (ms_size[j]==1000 && knn_size[k]==6)
+						continue;
+
+					string PRMfile = "ms6D_" + std::to_string(ms_size[j]) + "_"  + std::to_string(knn_size[k]) + ".prm";
+					cout << "*** Planning with " << PRMfile << endl;
+
+					double rt = runtime;
+					switch (knn_size[k]) {
+					case 2 :
+						if (ms_size[j]==500)
+							rt = 1000;
+						if (ms_size[j]==1000)
+							rt = 200;
+						break;
+					case 3 :
+						if (ms_size[j]==1000)
+							rt = 1000;
+						if (ms_size[j]==500)
+							rt = 500;
+						break;
+					case 4 :
+						rt = 1000;
+						break;
+					case 5 :
+						if (ms_size[j]==500 || ms_size[j]==1000)
+							rt = 1000;
+						break;
+					case 6 :
+						rt = 1000;
+						break;
+					default :
+						rt = runtime;
+					}
+
+					Plan.plan(c_start, c_goal, rt, PRMfile, num_nn);
+
+					// Log
+					ft << ms_size[j] << "\t" << knn_size[k] << "\t";
+					ifstream FromFile;
+					FromFile.open("./paths/perf_log.txt");
+					string line;
+					while (getline(FromFile, line))
+						ft << line << "\t";
+					FromFile.close();
+					ft << endl;
+
+				}
 			}
+
+			cout << "**************************************" << endl;
+			cout << "Completed " << (double)i/N*100 << "%." << endl;
+			cout << "**************************************" << endl;
 		}
+		ft.close();
 		break;
 	}
 	}

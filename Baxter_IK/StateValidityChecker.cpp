@@ -118,24 +118,27 @@ bool StateValidityChecker::close_chain(const ob::State *state, int active_chain)
 
 	bool valid = false;
 	if (!active_chain) {
+		//q2 = generate_random_arm_configuration(2);
 		FKsolve_rob(q1, 1);
 		Matrix T2 = MatricesMult(get_FK_solution_T1(), Q); // Returns the opposing required matrix of the rods tip at robot 2
 		T2 = MatricesMult(T2, {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the REQUIRED matrix of the rods tip at robot 2
 		for (int i = 0; i < 100 && !valid; i++) // Try to close the chain 100 times
-			valid = IKsolve_rob(T2, generate_random_arm_configuration(2), 2);
+			valid = IKsolve_rob(T2, q2, 2);
 		if (!valid)
 			return false;
 		q2 = get_IK_solution_q2();
+		cout << "******* Found IK\n";
 	}
 
 	if (active_chain || !valid) {
+		q1 = generate_random_arm_configuration(1);
 		Matrix Tinv = Q;
 		InvertMatrix(Q, Tinv); // Invert matrix
 		FKsolve_rob(q2, 2);
 		Matrix T1 = MatricesMult(get_FK_solution_T2(), {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the opposing required matrix of the rods tip at robot 2
 		T1 = MatricesMult(T1, Tinv); // Returns the REQUIRED matrix of the rods tip at rob
 		for (int i = 0; i < 100 && !valid; i++) // Try to close the chain 100 times
-			valid = IKsolve_rob(T1, generate_random_arm_configuration(1), 1);
+			valid = IKsolve_rob(T1, q1, 1);
 		if (!valid)
 			return false;
 		q1 = get_IK_solution_q1();

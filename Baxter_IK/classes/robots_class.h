@@ -48,7 +48,7 @@ private:
 	Matrix T_mult_temp;
 	Matrix T_pose;
 
-	bool grasp_pose; // true - rod is grasped such that it is continuous to the arm, false - rod is grasped perpendicular to the gripper plane
+	bool grasp_pose; // false - rod is grasped such that it is continuous to the arm, true - rod is grasped perpendicular to the gripper plane
 
 public:
 	// Constructor
