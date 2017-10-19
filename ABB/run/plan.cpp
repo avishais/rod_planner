@@ -247,13 +247,19 @@ int main(int argn, char ** args) {
 		std::ofstream ft;
 		ft.open("./matlab/Benchmark_poleScene.txt", ios::app);
 
-		int N = 100;
+		int N = 68;
 		for (int i = 0; i < N; i++) {
 
-			for( int j = 0; j < ms_size.size(); j++) {
+			for( int j = 1; j < 2/*ms_size.size()*/; j++) {
 				for (int k = 0; k < knn_size.size(); k++) {
 
+					if (k==2)
+						continue;
+
 					if (ms_size[j]==1000 && knn_size[k]==6)
+						continue;
+
+					if (ms_size[j]==100 && (knn_size[k]==2 || knn_size[k]==3 || knn_size[k]==5))
 						continue;
 
 					string PRMfile = "ms6D_" + std::to_string(ms_size[j]) + "_"  + std::to_string(knn_size[k]) + ".prm";
@@ -271,7 +277,7 @@ int main(int argn, char ** args) {
 						if (ms_size[j]==1000)
 							rt = 1000;
 						if (ms_size[j]==500)
-							rt = 500;
+							rt = 1000;
 						break;
 					case 4 :
 						rt = 1000;

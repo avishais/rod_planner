@@ -5,6 +5,12 @@ clc
 
 D = load('Benchmark_poleScene.txt');
 
+% D(D(:,1)==500 & D(:,2)==3 & D(:,3)==0,:) = [];
+% D(D(:,1)==500 & D(:,2)==2 & D(:,3)==0,:) = [];
+% D(D(:,1)==500 & D(:,2)==6 & D(:,3)==0,:) = [];
+% 
+% dlmwrite('Benchmark_poleScene.txt', D, ' ');
+
 %%
 
 ms = unique(D(:,1));
@@ -19,6 +25,7 @@ for i = 1:length(ms)
         S(i,j) = sum(K(:,1))/size(K,1);
         T(i,j) = mean(K(K(:,1)==1,3));
         T_std(i,j) = std(K(K(:,1)==1,3))/sqrt(size(K,1));
+        N(i,j) = size(K,1);
     end
 end
 
