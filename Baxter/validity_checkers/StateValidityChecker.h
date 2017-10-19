@@ -103,6 +103,7 @@ public:
 	void updateStateVector(const ob::State *state, State a, State q1, State q2);
 	void updateStateVector(const ob::State *state, State a);
 	void printStateVector(const ob::State *state);
+	void printStateVectorC(const ob::State *state);
 
 	void defaultSettings();
 	double normDistance(State, State);

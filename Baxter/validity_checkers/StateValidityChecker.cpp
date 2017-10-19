@@ -111,6 +111,25 @@ void StateValidityChecker::printStateVector(const ob::State *state) {
 	cout << "q2: "; kdl::printVector(q2);
 }
 
+void StateValidityChecker::printStateVectorC(const ob::State *state) {
+	// cast the abstract state type to the type we expect
+	const ob::CompoundStateSpace::StateType *C_state = state->as<ob::CompoundStateSpace::StateType>();
+	const ob::RealVectorStateSpace::StateType *A = C_state->as<ob::RealVectorStateSpace::StateType>(0);
+	const ob::RealVectorStateSpace::StateType *Q = C_state->as<ob::RealVectorStateSpace::StateType>(1);
+
+	State a(na), q1(nq/2), q2(nq/2);
+
+	cout << "{";
+	for (unsigned i = 0; i < na; i++)
+		cout << A->values[i] << ", "; // Set state of rod
+	for (unsigned i = 0; i < nq; i++) {
+		cout << Q->values[i];
+		if (i < nq-1)
+			cout << ", ";
+	}
+	cout << "}" << endl;
+}
+
 // ----------------------- v GD functions v ----------------------------
 
 bool StateValidityChecker::GDsample(ob::State *st) {

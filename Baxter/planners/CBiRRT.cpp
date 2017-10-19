@@ -175,6 +175,7 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::walk_on_PRM(TreeData &
 		Matrix P = path[i].index_indicator ? ms.P[path[i].index] : subms.P[path[i].index];
 		if (collision_state(P, q_target))
 			break;
+
 		/*if (!(no_collision_count % collision_buffer)) {
 			Matrix P = path[i].index_indicator ? ms.P[path[i].index] : subms.P[path[i].index];
 			if (collision_state(P, q1_target, q2_target)) {
@@ -196,6 +197,12 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::walk_on_PRM(TreeData &
 		motion->parent = nmotion;
 		motion->root = nmotion->root;
 		tree->add(motion);
+
+		//cout << "-----------------------------------\n";
+		//printStateVectorC(motion->state);
+		//printStateVectorC(motion->root);
+		//cout << StateDistance(motion->state, motion->root) << endl;
+
 
 		nmotion = motion;
 
@@ -221,6 +228,19 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 		cout << "..\n";
 		cin.ignore();
 		log_q(st2);
+		exit(1);
+	}*/
+
+	/*{
+		State a = {2.22952, -5.25809, 0.320264, -0.00201851, 0.0280598, -1.03726};
+		State q = {-0.803367, -0.901094, 0.868415, 0.544212, -2.48983, 0.545516, -0.308584, -0.0255141, -0.698368, -0.512214, -0.513807, 2.4486, -0.0797131, -1.71262 };
+
+		rod_solve(a);
+		cout << collision_state(getPMatrix(), q) << endl;
+
+		base::State *st = si_->allocState();
+		updateStateVector(st, a, q);
+		log_q(st);
 		exit(1);
 	}*/
 
