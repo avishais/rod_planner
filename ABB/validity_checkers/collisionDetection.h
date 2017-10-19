@@ -37,7 +37,7 @@ public:
 		return collisionCheck_time;
 	}
 
-	bool withObs = true; // Include obstacles (poles)?
+	bool withObs = false; // Include obstacles (poles)?
 };
 
 #endif

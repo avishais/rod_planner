@@ -190,6 +190,8 @@ int main(int argn, char ** args) {
 		num_nn = 2;
 	}
 
+	srand( time(NULL) );
+
 
 	plan_C Plan;
 
@@ -202,7 +204,7 @@ int main(int argn, char ** args) {
 
 	}
 
-	int mode = 3;
+	int mode = 4;
 	switch (mode) {
 	case 1 : {
 		map_index = 0;
@@ -297,6 +299,144 @@ int main(int argn, char ** args) {
 
 					// Log
 					ft << ms_size[j] << "\t" << knn_size[k] << "\t";
+					ifstream FromFile;
+					FromFile.open("./paths/perf_log.txt");
+					string line;
+					while (getline(FromFile, line))
+						ft << line << "\t";
+					FromFile.close();
+					ft << endl;
+
+				}
+			}
+
+			cout << "**************************************" << endl;
+			cout << "Completed " << (double)i/N*100 << "%." << endl;
+			cout << "**************************************" << endl;
+		}
+		ft.close();
+		break;
+	}
+	case 4 : { // Find 100 feasible paths taking random start and goal configurations in ./data/abb_samples_data.txt
+		// Remember to disable poles collisions before running this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		Matrix Cdb;
+		string line;
+
+		// Load all random confs.
+		std::ifstream File;
+		File.open("./data/abb_samples_data.txt");
+		State c_temp(18);
+		int i = 0;
+		while(!File.eof()) {
+			for (int j = 0; j < 18; j++) {
+				File >> c_temp[j];
+			}
+			Cdb.push_back(c_temp);
+			i++;
+		}
+		File.close();
+		Cdb.pop_back();
+
+		std::ofstream ft;
+		ft.open("./data/feasible_queries.txt", ios::app);
+
+		int count = 0, num_nn = 1;
+		vector<int> ms_size = {100, 500, 1000};
+		while (count < 94) {
+
+			int i1, i2;
+			do {
+				i1 = rand() % Cdb.size();
+				i2 = rand() % Cdb.size();
+
+			} while (i1==i2);
+			cout << "*** Loading queries for " << i1 << " and " << i2 << "." << endl;
+			State c_start = Cdb[i1];
+			State c_goal  = Cdb[i2];
+
+			for( int j = 0; j < ms_size.size(); j++) {
+				string PRMfile = "ms6D_" + std::to_string(ms_size[j]) + "_"  + std::to_string(4) + ".prm";
+				Plan.plan(c_start, c_goal, runtime, PRMfile, num_nn);
+
+				if (Plan.solved_bool) {
+					count++;
+
+					// Get comp. time
+					File.open("./paths/perf_log.txt");
+					for (int i = 0; i < 3; i++)
+						getline(File, line);
+					File.close();
+
+					ft << i1 << " " << i2 << " " << ms_size[j] << " " << line << endl;
+					break;
+				}
+			}
+		}
+		ft.close();
+		break;
+	}
+	case 5 : { // Tests the success rate of the all feasible queries found in case 4.
+		// Remember to disable poles collisions before running this !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+		vector<int> ms_size = {100, 500, 1000};
+		vector<int> knn_size = {2, 3, 4, 5, 6};
+		num_nn = 1;
+
+		// Load all random confs.
+		Matrix Cdb;
+		std::ifstream File;
+		File.open("./data/abb_samples_data.txt");
+		State c_temp(18);
+		int i = 0;
+		while(!File.eof()) {
+			for (int j=0; j < 18; j++) {
+				File >> c_temp[j];
+			}
+			Cdb.push_back(c_temp);
+			i++;
+		}
+		File.close();
+		Cdb.pop_back();
+
+		// Load all random queries.
+		Matrix I;
+		File.open("./data/feasible_queries.txt");
+		State i_temp(4);
+		i = 0;
+		while(!File.eof()) {
+			for (int j = 0; j < 4; j++) {
+				File >> i_temp[j];
+			}
+			I.push_back(i_temp);
+			i++;
+		}
+		File.close();
+		I.pop_back();
+
+		std::ofstream ft;
+		ft.open("./matlab/Benchmark_rand_sg_noObs.txt", ios::app);
+
+		int N = I.size();
+		for (int i = 0; i < N; i++) {
+
+			int i1 = I[i][0];
+			int i2 = I[i][1];
+			State c_start = Cdb[i1];
+			State c_goal  = Cdb[i2];
+
+			for( int j = 0; j < ms_size.size(); j++) {
+				for (int k = 0; k < knn_size.size(); k++) {
+
+					if (ms_size[j]==1000 && knn_size[k]==6)
+						continue;
+
+					string PRMfile = "ms6D_" + std::to_string(ms_size[j]) + "_"  + std::to_string(knn_size[k]) + ".prm";
+					cout << "*** Planning with " << PRMfile << endl;
+
+					Plan.plan(c_start, c_goal, runtime, PRMfile, num_nn);
+
+					// Log
+					ft << ms_size[j] << "\t" << knn_size[k] << "\t" << i1 << "\t" << i2 << "\t";
 					ifstream FromFile;
 					FromFile.open("./paths/perf_log.txt");
 					string line;
