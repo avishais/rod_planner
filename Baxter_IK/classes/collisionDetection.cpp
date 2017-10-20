@@ -541,7 +541,7 @@ int collisionDetection::collision_state(Matrix M, State q1, State q2)
 	// if any parts in collision
 	for (int i = 0; i <= num_links2check; ++i) {
 		if (res[i].CloserThanTolerance() == 1){
-			//std::cout << "Collision in " << i << std::endl;
+			std::cout << "Collision in " << i << std::endl;
 			return 1;
 		}
 	}

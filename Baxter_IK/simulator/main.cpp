@@ -59,6 +59,9 @@ int visualizeRobots = 1, visualize = 1;
 double blackFrame[] = {50./255,50./255,50./255};
 double redFrame[] = {175./255,0./255,0./255};
 
+void execute_path(int);
+void load_path();
+
 void pm(PQP_REAL M[][3], std::string str) {
 	std::cout << str << std::endl;
 
@@ -157,8 +160,31 @@ void KeyboardCB(unsigned char key, int x, int y)
 	case '=': rot52 += .1; break;
 	case 'o': rot62 += .1; break;
 	case 'p': rot72 += .1; break;
+	case 'r':
+		std::cout << "Updating path...\n";
+		load_path();
+		for (int i = 0; i < RoboStates.size(); i++) {
+			for (int j = 0; j < RoboStates[i].size(); j++)
+				std::cout << RoboStates[i][j] << " ";
+			std::cout << std::endl;
+		}
+		int k = 0;
+		rot1 = RoboStates[k][0];
+		rot2 = RoboStates[k][1];
+		rot3 = RoboStates[k][2];
+		rot4 = RoboStates[k][3];
+		rot5 = RoboStates[k][4];
+		rot6 = RoboStates[k][5];
+		rot7 = RoboStates[k][6];
+		rot12 = RoboStates[k][7];
+		rot22 = RoboStates[k][8];
+		rot32 = RoboStates[k][9];
+		rot42 = RoboStates[k][10];
+		rot52 = RoboStates[k][11];
+		rot62 = RoboStates[k][12];
+		rot72 = RoboStates[k][13];
+		break;
 	}
-
 	glutPostRedisplay();
 }
 
@@ -635,123 +661,6 @@ void DisplayCB()
 	//pm(REE2, "Ree2");
 	//pv(Trod, "Tee2");
 
-	/*
-    PQP_REAL tolerance=8.0;
-	PQP_ToleranceResult res[99];
-
-	// robot 1 collision
-	PQP_Tolerance(&res[0],R0,TP,&ped,R5,T5,&link5,tolerance);
-	PQP_Tolerance(&res[1],R0,TP,&ped,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[2],R0,TP,&ped,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[3],R0,TP,&ped,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[4],R0,T0,&base,R4,T4,&link4,tolerance);
-	PQP_Tolerance(&res[5],R0,T0,&base,R5,T5,&link5,tolerance);
-	PQP_Tolerance(&res[6],R0,T0,&base,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[7],R0,T0,&base,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[8],R0,T0,&base,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[9],R1,T1,&link1,R5,T5,&link5,tolerance);
-	PQP_Tolerance(&res[10],R1,T1,&link1,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[11],R1,T1,&link1,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[12],R1,T1,&link1,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[13],R2,T2_t,&link2,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[14],R2,T2_t,&link2,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[15],R2,T2_t,&link2,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[16],R3,T3,&link3,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[17],R3,T3,&link3,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[18],R3,T3,&link3,REE,TEE,&EE,tolerance);
-
-	// robot 2 collision
-	PQP_Tolerance(&res[19],R0,TP,&ped,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[20],R0,TP,&ped,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[21],R0,TP,&ped,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[22],R0,TP,&ped,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[23],R02,T02,&base,R42,T42,&link42,tolerance);
-	PQP_Tolerance(&res[24],R02,T02,&base,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[25],R02,T02,&base,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[26],R02,T02,&base,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[27],R02,T02,&base,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[28],R12,T12,&link12,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[29],R12,T12,&link12,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[30],R12,T12,&link12,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[31],R12,T12,&link12,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[32],R22,T2_t2,&link22,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[33],R22,T2_t2,&link22,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[34],R22,T2_t2,&link22,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[35],R32,T32,&link32,R62,T6,&link6,tolerance);
-	PQP_Tolerance(&res[36],R32,T32,&link32,R72,T7,&link7,tolerance);
-	PQP_Tolerance(&res[37],R32,T32,&link32,REE,TEE,&EE,tolerance);
-
-	// inter-robot collision 
-	PQP_Tolerance(&res[38],R1,T1,&link1,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[39],R1,T1,&link1,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[40],R1,T1,&link1,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[41],R1,T1,&link1,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[42],R2,T2,&link2,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[43],R2,T2,&link2,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[44],R2,T2,&link2,REE,TEE,&EE,tolerance);
-
-	PQP_Tolerance(&res[45],R12,T12,&link12,R5,T5,&link5,tolerance);
-	PQP_Tolerance(&res[46],R12,T12,&link12,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[47],R12,T12,&link12,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[48],R12,T12,&link12,REE2,TEE2,&EE2,tolerance);
-	PQP_Tolerance(&res[49],R22,T22,&link22,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[50],R22,T22,&link22,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[51],R22,T22,&link22,REE2,TEE2,&EE2,tolerance);
-
-	PQP_Tolerance(&res[52],R3,T3,&link3,R32,T32,&link32,tolerance);
-	PQP_Tolerance(&res[53],R3,T3,&link3,R42,T42,&link42,tolerance);
-	PQP_Tolerance(&res[54],R3,T3,&link3,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[55],R3,T3,&link3,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[56],R3,T3,&link3,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[57],R3,T3,&link3,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[58],R4,T4,&link4,R32,T32,&link32,tolerance);
-	PQP_Tolerance(&res[59],R4,T4,&link4,R42,T42,&link42,tolerance);
-	PQP_Tolerance(&res[60],R4,T4,&link4,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[61],R4,T4,&link4,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[62],R4,T4,&link4,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[63],R4,T4,&link4,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[64],R5,T5,&link5,R32,T32,&link32,tolerance);
-	PQP_Tolerance(&res[65],R5,T5,&link5,R42,T42,&link42,tolerance);
-	PQP_Tolerance(&res[66],R5,T5,&link5,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[67],R5,T5,&link5,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[68],R5,T5,&link5,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[69],R5,T5,&link5,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[70],R6,T6,&link6,R32,T32,&link32,tolerance);
-	PQP_Tolerance(&res[71],R6,T6,&link6,R42,T42,&link42,tolerance);
-	PQP_Tolerance(&res[72],R6,T6,&link6,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[73],R6,T6,&link6,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[74],R6,T6,&link6,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[75],R6,T6,&link6,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[76],R7,T7,&link7,R32,T32,&link32,tolerance);
-	PQP_Tolerance(&res[77],R7,T7,&link7,R42,T42,&link42,tolerance);
-	PQP_Tolerance(&res[78],R7,T7,&link7,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[79],R7,T7,&link7,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[80],R7,T7,&link7,R72,T72,&link72,tolerance);
-	PQP_Tolerance(&res[81],R7,T7,&link7,REE,TEE,&EE,tolerance);
-
-
-	// robot collision with rod
-	PQP_Tolerance(&res[82],R7,T7,&rod,R2,T2_t,&link2,tolerance);
-	PQP_Tolerance(&res[83],R7,T7,&rod,R3,T3,&link3,tolerance);
-	PQP_Tolerance(&res[84],R7,T7,&rod,R4,T4,&link4,tolerance);
-	PQP_Tolerance(&res[85],R7,T7,&rod,R5,T5,&link5,tolerance);
-	PQP_Tolerance(&res[86],R7,T7,&rod,R6,T6,&link6,tolerance);
-	PQP_Tolerance(&res[87],R7,T7,&rod,R7,T7,&link7,tolerance);
-	PQP_Tolerance(&res[88],R7,T7,&rod,R02,T02,&base2,tolerance);
-	PQP_Tolerance(&res[89],R7,T7,&rod,R12,T12,&link12,tolerance);
-	PQP_Tolerance(&res[90],R7,T7,&rod,R22,T2_t2,&link22,tolerance);
-	PQP_Tolerance(&res[91],R7,T7,&rod,R32,T32,&link32,tolerance);
-	PQP_Tolerance(&res[92],R7,T7,&rod,R42,T42,&link42,tolerance);
-	PQP_Tolerance(&res[93],R7,T7,&rod,R52,T52,&link52,tolerance);
-	PQP_Tolerance(&res[94],R7,T7,&rod,R62,T62,&link62,tolerance);
-	PQP_Tolerance(&res[95],R7,T7,&rod,R72,T72,&link72,tolerance);
-
-	// rod collisions with EE's with rod not counting buffer from parent EE
-	PQP_Tolerance(&res[96],REE,TEE,&EE,REE,TEE,&EE2,tolerance);
-	PQP_Tolerance(&res[97],REE,TEE,&rod,REE,TEE,&EE,tolerance);
-	PQP_Tolerance(&res[98],REE,TEE,&rod,REE2,TEE2,&EE,tolerance);
-	 */
-
 	T2[0] =  0;
 	T2[1] =  0;//$.1*1000;
 	T2[2] =  0.1*1000;
@@ -814,7 +723,7 @@ void DisplayCB()
 	MRotX(Mclp,-3.1415926/2);
 	MxM(Rclp2, REE2, Mclp);
 
-	if (!grasp_pose) {
+	if (grasp_pose) {
 		MRotZ(Mclp,-3.1415926/2);
 		MxM(MInt, Rclp2, Mclp);
 		MRotX(Mclp,0);
@@ -852,7 +761,7 @@ void DisplayCB()
 		glPopMatrix();
 
 		// Cone 1
-		MRotX(R0,0);
+		/*MRotX(R0,0);
 		Ti[0] = 910; Ti[1] = 260; Ti[2] = 20;
 		glColor3d(1.0,1.0,1.0);
 		MVtoOGL(oglm,R0,Ti);
@@ -869,7 +778,7 @@ void DisplayCB()
 		glPushMatrix();
 		glMultMatrixd(oglm);
 		wall_to_draw->Draw();
-		glPopMatrix();
+		glPopMatrix();*/
 
 	}
 
@@ -1402,6 +1311,77 @@ void load_models(){
 
 }
 
+void load_path() {
+	const char* rod_pfile = "../path/rod_path.txt";
+	const char* robot_pfile = "../path/robot_paths.txt";
+	FILE *fro, *fr;
+	int i, nlines;
+
+	fr = fopen(robot_pfile,"r");
+	if (fr == NULL) { fprintf(stderr,"Couldn't open robot_path.txt\n"); exit(-1); }
+	fscanf(fr,"%i",&nlines);  //NOT include number in line count itself
+	RoboStates.resize(nlines);
+
+	for (i = 0; i < nlines; i++)
+	{
+		double rot1T,rot2T,rot3T,rot4T,rot5T,rot6T,rot7T;
+		double rot52T,rot62T,rot12T,rot22T,rot32T,rot42T,rot72T;
+		fscanf(fr,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+				&rot1T,&rot2T,&rot3T,&rot4T,&rot5T,&rot6T,&rot7T,&rot12T, \
+				&rot22T,&rot32T,&rot42T,&rot52T,&rot62T,&rot72T);
+
+		RoboStates[i].resize(14);
+		RoboStates[i][0]=rot1T;RoboStates[i][1]=rot2T;RoboStates[i][2]=rot3T;
+		RoboStates[i][3]=rot4T;RoboStates[i][4]=rot5T;RoboStates[i][5]=rot6T;RoboStates[i][6]=rot7T;
+		RoboStates[i][7]=rot12T;RoboStates[i][8]=rot22T;RoboStates[i][9]=rot32T;
+		RoboStates[i][10]=rot42T;RoboStates[i][11]=rot52T;RoboStates[i][12]=rot62T;RoboStates[i][13]=rot72T;
+	}
+
+	fclose(fr);
+
+	fro = fopen(rod_pfile,"r");
+	if (fro == NULL) { fprintf(stderr,"Couldn't open rod_path.txt\n"); exit(-1); }
+	fscanf(fro,"%i",&nlines);  //DO include number in line count itself
+
+	int config_num = 0;
+	RodStates.resize(nlines/500);
+
+	for(i=0;i<nlines/500;i++){
+		RodStates[i].resize(500);
+		for(int j=0;j<500;j++){
+			RodStates[i][j].resize(3);
+		}
+	}
+
+
+	for (i = 2; i <= nlines; i++)
+	{
+		double px,py,pz;
+		if (i-501*config_num == 502){
+			config_num += 1;
+			continue;
+		}
+
+		fscanf(fro,"%lf %lf %lf",&px,&py,&pz);
+
+		int index = i-501*config_num-2;
+
+		if (config_num == 0 && i < 500){index=i-2;}
+
+		if (index == 500){std::cout << "error in indexing" << std::endl; break;}
+
+		RodStates[config_num][index][0]=px;
+		RodStates[config_num][index][1]=py;
+		RodStates[config_num][index][2]=pz;
+	}
+
+	fclose(fro);
+
+	if(RodStates.size() != RoboStates.size()){
+		std::cout << "error! Non-equal sizes" << std::endl;
+	}
+}
+
 
 void execute_path(int k){
 
@@ -1508,8 +1488,8 @@ void execute_path(int k){
 	}
 
 	if(k<RoboStates.size()) {
-		if (step==1)
-			sleep(3);
+		//if (step==1)
+		//	sleep(3);
 
 		step+=1;
 		//we see that middle pose gets called, second is not

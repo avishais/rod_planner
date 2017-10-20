@@ -21,9 +21,11 @@ LDFLAGS=  -L${OMPL_DIR}/lib -L${OMPL_DIR}/lib/x86_64-linux-gnu -lompl -lompl_app
 CPP_ADD4 =  $(ROD_CLASSES)prm_gen.cpp myRRTConnect.cpp $(ROD_CLASSES)/classes/Rod_ODE_class.cpp $(ROD_CLASSES)/classes/slice.cpp $(INC_CLASSES)robots_class.cpp StateValidityChecker.cpp 
 CPP_ADD3 =  $(ROD_CLASSES)prm_gen.cpp $(ROD_CLASSES)/classes/Rod_ODE_class.cpp $(ROD_CLASSES)/classes/slice.cpp $(INC_CLASSES)robots_class.cpp StateValidityChecker.cpp 
 CPPPQP2 = ${INC_CLASSES}collisionDetection.cpp ${INC_CLASSES}model.cpp
+CPP_SET =  $(ROD_CLASSES)prm_gen.cpp setPose.cpp $(ROD_CLASSES)/classes/Rod_ODE_class.cpp $(ROD_CLASSES)/classes/slice.cpp $(INC_CLASSES)robots_class.cpp StateValidityChecker.cpp 
 
 all:
-	${CXX} plan.cpp ${CPP_ADD4} ${CPPPQP2} -o plan ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
+	#${CXX} plan.cpp ${CPP_ADD4} ${CPPPQP2} -o plan ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
 	#$(CXX) smooth.cpp $(CPP_ADD3) $(CPPPQP2) -o smo $(CXXFLAGS) $(LDFLAGS) -std=c++11 #-Wall
 	#$(CXX) fillpath.cpp $(CPP_ADD3) $(CPPPQP2) -o fill $(CXXFLAGS) $(LDFLAGS) -std=c++11 #-Wall
+	${CXX} plan.cpp ${CPP_SET} ${CPPPQP2} -o st ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
 	

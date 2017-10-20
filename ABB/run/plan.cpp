@@ -436,7 +436,7 @@ int main(int argn, char ** args) {
 					Plan.plan(c_start, c_goal, runtime, PRMfile, num_nn);
 
 					// Log
-					ft << ms_size[j] << "\t" << knn_size[k] << "\t" << i1 << "\t" << i2 << "\t";
+					ft << ms_size[j] << "\t" << knn_size[k] << "\t" << i << "\t";
 					ifstream FromFile;
 					FromFile.open("./paths/perf_log.txt");
 					string line;
