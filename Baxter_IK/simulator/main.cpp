@@ -33,6 +33,8 @@ bool grasp_pose = true; // false - rod is grasped such that it is continuous to 
 
 double oglm[16];
 
+double Xc = 650, Yc = 380;
+
 bool step_sim = false;
 int sim_velocity;
 
@@ -160,6 +162,10 @@ void KeyboardCB(unsigned char key, int x, int y)
 	case '=': rot52 += .1; break;
 	case 'o': rot62 += .1; break;
 	case 'p': rot72 += .1; break;
+	case 'd': Yc += 1; break;
+	case 'a': Yc -= 1; break;
+	case 'w': Xc -= 1; break;
+	case 's': Xc += 1; break;
 	case 'r':
 		std::cout << "Updating path...\n";
 		load_path();
@@ -742,7 +748,7 @@ void DisplayCB()
 	if(withObs){
 		// Table
 		MRotZ(R0,3.1415926/2);
-		Ti[0]=1000; Ti[1]=0; Ti[2]=20;
+		Ti[0] = 850; Ti[1] = 0; Ti[2] = 20;
 		glColor3d(.93, .69, .13);//172/255.0, 102/255.0, 13/255.0);//0.0,0.0,1.0);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
@@ -761,9 +767,9 @@ void DisplayCB()
 		glPopMatrix();
 
 		// Cone 1
-		/*MRotX(R0,0);
-		Ti[0] = 910; Ti[1] = 260; Ti[2] = 20;
-		glColor3d(1.0,1.0,1.0);
+		MRotZ(R0,-3.1415926/2);
+		Ti[0] = Xc; Ti[1] = Yc; Ti[2] = 20;
+		glColor3d(0.0,1.0,0.0);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -771,7 +777,7 @@ void DisplayCB()
 		glPopMatrix();
 
 		// Cone 2
-		MRotX(R0,3.1415926);
+		/*MRotX(R0,3.1415926);
 		Ti[0] = 910; Ti[1] = 260; Ti[2] = 380*2+80;
 		glColor3d(1.0,1.0,1.0);
 		MVtoOGL(oglm,R0,Ti);
@@ -1286,10 +1292,10 @@ void load_models(){
 		fclose(fp);
 
 		// initialize wall
-		wall_to_draw = new Model("cone.tris");
+		wall_to_draw = new Model("route.tris");
 
-		fp = fopen("cone.tris","r");
-		if (fp == NULL) { fprintf(stderr,"Couldn't open cone.tris\n"); exit(-1); }
+		fp = fopen("route.tris","r");
+		if (fp == NULL) { fprintf(stderr,"Couldn't open route.tris\n"); exit(-1); }
 		fscanf(fp,"%d",&ntris);
 
 		wall.BeginModel();
