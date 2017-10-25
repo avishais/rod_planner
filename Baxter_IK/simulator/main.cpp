@@ -33,7 +33,7 @@ bool grasp_pose = true; // false - rod is grasped such that it is continuous to 
 
 double oglm[16];
 
-double Xc = 650, Yc = 380;
+double Xc = 737, Yc = 311, THc = -1.9708;
 
 bool step_sim = false;
 int sim_velocity;
@@ -166,6 +166,8 @@ void KeyboardCB(unsigned char key, int x, int y)
 	case 'a': Yc -= 1; break;
 	case 'w': Xc -= 1; break;
 	case 's': Xc += 1; break;
+	case 'z': THc += 0.1; break;
+	case 'x': THc -= 0.1; break;
 	case 'r':
 		std::cout << "Updating path...\n";
 		load_path();
@@ -191,6 +193,9 @@ void KeyboardCB(unsigned char key, int x, int y)
 		rot72 = RoboStates[k][13];
 		break;
 	}
+
+	std::cout << Xc << " " << Yc << " " << THc << std::endl;
+
 	glutPostRedisplay();
 }
 
@@ -767,7 +772,7 @@ void DisplayCB()
 		glPopMatrix();
 
 		// Cone 1
-		MRotZ(R0,-3.1415926/2);
+		MRotZ(R0,THc);
 		Ti[0] = Xc; Ti[1] = Yc; Ti[2] = 20;
 		glColor3d(0.0,1.0,0.0);
 		MVtoOGL(oglm,R0,Ti);

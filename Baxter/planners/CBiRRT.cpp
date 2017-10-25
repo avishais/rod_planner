@@ -232,15 +232,14 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	}*/
 
 	/*{
-		State a = {2.22952, -5.25809, 0.320264, -0.00201851, 0.0280598, -1.03726};
-		State q = {-0.803367, -0.901094, 0.868415, 0.544212, -2.48983, 0.545516, -0.308584, -0.0255141, -0.698368, -0.512214, -0.513807, 2.4486, -0.0797131, -1.71262 };
+		State a(6), q(14);
+		const base::State *st1 = pis_.nextGoal();
+		retrieveStateVector(st1, a, q);
 
 		rod_solve(a);
 		cout << collision_state(getPMatrix(), q) << endl;
 
-		base::State *st = si_->allocState();
-		updateStateVector(st, a, q);
-		log_q(st);
+		log_q(st1);
 		exit(1);
 	}*/
 

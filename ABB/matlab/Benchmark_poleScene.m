@@ -1,3 +1,5 @@
+% Benchmarking the pole scene of the ABB robots
+
 clear all
 clc
 

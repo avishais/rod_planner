@@ -204,7 +204,7 @@ int main(int argn, char ** args) {
 
 	}
 
-	int mode = 4;
+	int mode = 5;
 	switch (mode) {
 	case 1 : {
 		map_index = 0;
@@ -417,7 +417,7 @@ int main(int argn, char ** args) {
 		ft.open("./matlab/Benchmark_rand_sg_noObs.txt", ios::app);
 
 		int N = I.size();
-		for (int i = 0; i < N; i++) {
+		for (int i = 36; i < N; i++) {
 
 			int i1 = I[i][0];
 			int i2 = I[i][1];
@@ -436,7 +436,7 @@ int main(int argn, char ** args) {
 					Plan.plan(c_start, c_goal, runtime, PRMfile, num_nn);
 
 					// Log
-					ft << ms_size[j] << "\t" << knn_size[k] << "\t" << i << "\t";
+					ft << ms_size[j] << "\t" << knn_size[k] << "\t" << i << "\t" << i1 << "\t" << i2 << "\t";
 					ifstream FromFile;
 					FromFile.open("./paths/perf_log.txt");
 					string line;

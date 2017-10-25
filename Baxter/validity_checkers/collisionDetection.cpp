@@ -362,7 +362,7 @@ int collisionDetection::collision_state(Matrix M, State q)
 
 	// perform tolerance query
 
-	PQP_REAL tolerance = 5.0;
+	PQP_REAL tolerance = 8.0;
 	PQP_ToleranceResult res[133];
 
 	// robot 1 collision
@@ -492,7 +492,7 @@ int collisionDetection::collision_state(Matrix M, State q)
 
 		// Table
 		MRotZ(Rtable,3.1415926/2);
-		Ttable[0]=1000; Ttable[1]=0; Ttable[2]=20;
+		Ttable[0] = 850; Ttable[1] = 0; Ttable[2] = 20;
 
 		PQP_Tolerance(&res[106],Rtable,Ttable,&table,REE,TEE,&EE,tolerance);
 		PQP_Tolerance(&res[107],Rtable,Ttable,&table,R5,T5,&link5,tolerance);
@@ -504,37 +504,23 @@ int collisionDetection::collision_state(Matrix M, State q)
 		PQP_Tolerance(&res[113],Rtable,Ttable,&table,R72,T72,&link72,tolerance);
 		PQP_Tolerance(&res[114],Rtable,Ttable,&table,Rrod_v,Trod,&rod,tolerance);
 
-		// Cone1
-		MRotX(Rcone, 3.1415926);
-		Tcone[0] = 910; Tcone[1] = 260; Tcone[2] = 380;
+		// Route
+		MRotZ(Rcone, -1.9708);
+		Tcone[0] = 737; Tcone[1] = 311; Tcone[2] = 20;
 
-		PQP_Tolerance(&res[115],Rcone,Tcone,&cone1,REE,TEE,&EE,tolerance);
-		PQP_Tolerance(&res[116],Rcone,Tcone,&cone1,R5,T5,&link5,tolerance);
-		PQP_Tolerance(&res[117],Rcone,Tcone,&cone1,R6,T6,&link6,tolerance);
-		PQP_Tolerance(&res[118],Rcone,Tcone,&cone1,R7,T7,&link7,tolerance);
-		PQP_Tolerance(&res[119],Rcone,Tcone,&cone1,REE2,TEE2,&EE2,tolerance);
-		PQP_Tolerance(&res[120],Rcone,Tcone,&cone1,R52,T52,&link52,tolerance);
-		PQP_Tolerance(&res[121],Rcone,Tcone,&cone1,R62,T62,&link62,tolerance);
-		PQP_Tolerance(&res[122],Rcone,Tcone,&cone1,R72,T72,&link72,tolerance);
-		PQP_Tolerance(&res[123],Rcone,Tcone,&cone1,Rrod_v,Trod,&rod,tolerance);
-
-		// Cone2
-		/*MRotX(Rcone, 0);//3.1415926);
-		Tcone[0] = 910; Tcone[1] = 260; Tcone[2] = 325;//380*2+80;
-
-		PQP_Tolerance(&res[124],Rcone,Tcone,&cone2,REE,TEE,&EE,tolerance);
-		PQP_Tolerance(&res[125],Rcone,Tcone,&cone2,R5,T5,&link5,tolerance);
-		PQP_Tolerance(&res[126],Rcone,Tcone,&cone2,R6,T6,&link6,tolerance);
-		PQP_Tolerance(&res[127],Rcone,Tcone,&cone2,R7,T7,&link7,tolerance);
-		PQP_Tolerance(&res[128],Rcone,Tcone,&cone2,REE2,TEE2,&EE2,tolerance);
-		PQP_Tolerance(&res[129],Rcone,Tcone,&cone2,R52,T52,&link52,tolerance);
-		PQP_Tolerance(&res[130],Rcone,Tcone,&cone2,R62,T62,&link62,tolerance);
-		PQP_Tolerance(&res[131],Rcone,Tcone,&cone2,R72,T72,&link72,tolerance);
-		PQP_Tolerance(&res[132],Rcone,Tcone,&cone2,Rrod_v,Trod,&rod,tolerance);*/
+		PQP_Tolerance(&res[115],Rcone,Tcone,&route,REE,TEE,&EE,tolerance);
+		PQP_Tolerance(&res[116],Rcone,Tcone,&route,R5,T5,&link5,tolerance);
+		PQP_Tolerance(&res[117],Rcone,Tcone,&route,R6,T6,&link6,tolerance);
+		PQP_Tolerance(&res[118],Rcone,Tcone,&route,R7,T7,&link7,tolerance);
+		PQP_Tolerance(&res[119],Rcone,Tcone,&route,REE2,TEE2,&EE2,tolerance);
+		PQP_Tolerance(&res[120],Rcone,Tcone,&route,R52,T52,&link52,tolerance);
+		PQP_Tolerance(&res[121],Rcone,Tcone,&route,R62,T62,&link62,tolerance);
+		PQP_Tolerance(&res[122],Rcone,Tcone,&route,R72,T72,&link72,tolerance);
+		PQP_Tolerance(&res[123],Rcone,Tcone,&route,Rrod_v,Trod,&rod,tolerance);
 
 		// Obs1
 		MRotZ(Rcone,0);
-		Tcone[0] = 900; Tcone[1] = -500; Tcone[2] = 20;
+		Tcone[0] = 735; Tcone[1] = -300; Tcone[2] = 20;
 
 		PQP_Tolerance(&res[124],Rcone,Tcone,&obs,REE,TEE,&EE,tolerance);
 		PQP_Tolerance(&res[125],Rcone,Tcone,&obs,R5,T5,&link5,tolerance);
@@ -977,12 +963,12 @@ void collisionDetection::load_models(){
 		fclose(fp);
 
 
-		// Cone 1
-		fp = fopen(CADLINK "cone1.tris","r");
-		if (fp == NULL) { fprintf(stderr,"Couldn't open cone1.tris\n"); exit(-1); }
+		// Routing
+		fp = fopen(CADLINK "route2.tris","r");
+		if (fp == NULL) { fprintf(stderr,"Couldn't open route2.tris\n"); exit(-1); }
 		fscanf(fp,"%d",&ntris);
 
-		collisionDetection::cone1.BeginModel();
+		collisionDetection::route.BeginModel();
 		for (i = 0; i < ntris; i++)
 		{
 			double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
@@ -992,29 +978,9 @@ void collisionDetection::load_models(){
 			p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
 			p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
 			p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-			collisionDetection::cone1.AddTri(p1,p2,p3,i);
+			collisionDetection::route.AddTri(p1,p2,p3,i);
 		}
-		collisionDetection::cone1.EndModel();
-		fclose(fp);
-
-		// Cone 1
-		fp = fopen(CADLINK "cone2.tris","r");
-		if (fp == NULL) { fprintf(stderr,"Couldn't open cone2.tris\n"); exit(-1); }
-		fscanf(fp,"%d",&ntris);
-
-		collisionDetection::cone2.BeginModel();
-		for (i = 0; i < ntris; i++)
-		{
-			double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
-			fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
-					&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
-			PQP_REAL p1[3],p2[3],p3[3];
-			p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
-			p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
-			p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-			collisionDetection::cone2.AddTri(p1,p2,p3,i);
-		}
-		collisionDetection::cone2.EndModel();
+		collisionDetection::route.EndModel();
 		fclose(fp);
 
 		// Pole

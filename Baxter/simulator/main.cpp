@@ -11,10 +11,10 @@
 
 PQP_Model base, link1, link2, link3, link4, link5, link6, link7, ped;
 Model *base_to_draw, *link1_to_draw, *link2_to_draw, *link3_to_draw, \
-*link4_to_draw, *link5_to_draw, *link6_to_draw, *link7_to_draw, *ped_to_draw, *clamps_to_draw, *clamps_to_draw2, *table_to_draw, *obs1_to_draw, *cone_to_draw, *cone2_to_draw;
+*link4_to_draw, *link5_to_draw, *link6_to_draw, *link7_to_draw, *ped_to_draw, *clamps_to_draw, *clamps_to_draw2, *table_to_draw, *obs1_to_draw, *route_to_draw;
 
 PQP_Model base2, link12, link22, link32, link42, link52, link62, link72, rod, EE, EE2, clmp, clmp2;
-PQP_Model table, obs1, cone, cone2;
+PQP_Model table, obs1, route;
 Model *link1_to_draw2, *link2_to_draw2, *link3_to_draw2, \
 *link4_to_draw2, *link5_to_draw2, *link6_to_draw2, *link7_to_draw2, \
 *rod_to_draw, *EE_to_draw, *EE_to_draw2;
@@ -831,7 +831,7 @@ void DisplayCB()
 	if(withObs){
 		// Table
 		MRotZ(R0,3.1415926/2);
-		Ti[0]=1000; Ti[1]=0; Ti[2]=20;
+		Ti[0] = 850; Ti[1] = 0; Ti[2] = 20;
 		glColor3d(.93, .69, .13);//172/255.0, 102/255.0, 13/255.0);//0.0,0.0,1.0);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
@@ -841,7 +841,7 @@ void DisplayCB()
 
 		// Obs 1
 		MRotZ(R0,0);
-		Ti[0] = 900; Ti[1] = -500; Ti[2] = 20;
+		Ti[0] = 735; Ti[1] = -300; Ti[2] = 20;
 		glColor3d(1.0,1.0,1.0);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
@@ -850,35 +850,14 @@ void DisplayCB()
 		glPopMatrix();
 
 		// Cone 1
-		MRotX(R0,3.1415926);
-		Ti[0] = 910; Ti[1] = 260; Ti[2] = 380;
-		glColor3d(1.0,1.0,1.0);
+		MRotZ(R0,-1.9708);
+		Ti[0] = 737; Ti[1] = 311; Ti[2] = 20;
+		glColor3d(0.0,1.0,0.0);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
 		glMultMatrixd(oglm);
-		cone_to_draw->Draw();
+		route_to_draw->Draw();
 		glPopMatrix();
-
-		// Cone 1
-		/*MRotX(R0,0);
-		Ti[0] = 910; Ti[1] = 260; Ti[2] = 325;
-		glColor3d(1.0,1.0,1.0);
-		MVtoOGL(oglm,R0,Ti);
-		glPushMatrix();
-		glMultMatrixd(oglm);
-		cone2_to_draw->Draw();
-		glPopMatrix();*/
-
-		// Cone 2
-		/*MRotX(R0,3.1415926);
-		Ti[0] = 910; Ti[1] = 260; Ti[2] = 380*2+80;
-		glColor3d(1.0,1.0,1.0);
-		MVtoOGL(oglm,R0,Ti);
-		glPushMatrix();
-		glMultMatrixd(oglm);
-		cone_to_draw->Draw();
-		glPopMatrix();*/
-
 	}
 
 	EndDraw();
@@ -1385,13 +1364,13 @@ void load_models(){
 		fclose(fp);
 
 		// initialize cone
-		cone_to_draw = new Model("cone1.tris");
+		route_to_draw = new Model("route.tris");
 
-		fp = fopen("cone1.tris","r");
-		if (fp == NULL) { fprintf(stderr,"Couldn't open cone.tris\n"); exit(-1); }
+		fp = fopen("route.tris","r");
+		if (fp == NULL) { fprintf(stderr,"Couldn't open route.tris\n"); exit(-1); }
 		fscanf(fp,"%d",&ntris);
 
-		cone.BeginModel();
+		route.BeginModel();
 		for (i = 0; i < ntris; i++)
 		{
 			double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
@@ -1401,31 +1380,9 @@ void load_models(){
 			p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
 			p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
 			p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-			cone.AddTri(p1,p2,p3,i);
+			route.AddTri(p1,p2,p3,i);
 		}
-		cone.EndModel();
-		fclose(fp);
-
-		// initialize con2
-		cone2_to_draw = new Model("cone2.tris");
-
-		fp = fopen("cone2.tris","r");
-		if (fp == NULL) { fprintf(stderr,"Couldn't open cone2.tris\n"); exit(-1); }
-		fscanf(fp,"%d",&ntris);
-
-		cone2.BeginModel();
-		for (i = 0; i < ntris; i++)
-		{
-			double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
-			fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
-					&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
-			PQP_REAL p1[3],p2[3],p3[3];
-			p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
-			p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
-			p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-			cone2.AddTri(p1,p2,p3,i);
-		}
-		cone2.EndModel();
+		route.EndModel();
 		fclose(fp);
 	}
 

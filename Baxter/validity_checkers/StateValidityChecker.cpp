@@ -138,7 +138,7 @@ bool StateValidityChecker::GDsample(ob::State *st) {
 
 	if (!GDsample(a, q))
 		return false;
-cout << __LINE__ << endl;
+
 	updateStateVector(st, a, q);
 	return true;
 }
