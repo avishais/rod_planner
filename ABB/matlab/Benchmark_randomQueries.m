@@ -3,11 +3,11 @@
 % connections.
 
 clear all
-clc
+% clc
 
 %%
 
-D = load('Benchmark_rand_sg_noObs.txt');
+D = load('Benchmark_rand_sg_noObs_b4.txt');
 
 %% Check
 
@@ -52,5 +52,9 @@ zlabel('success rate');
 %%
 
 figure(2)
-plotyy(knn, S(2,:), knn, T(2,:));
+[hAx,hLine1,hLine2] = plotyy(knn, S(2,:)*100, knn, T(2,:));
 legend('success rate','runtime (sec)');
+xlabel('k nearest neighbors')
+
+ylabel(hAx(1),'success rate (%)') % left y-axis
+ylabel(hAx(2),'runtime (sec)') % right y-axis

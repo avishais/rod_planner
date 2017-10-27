@@ -38,15 +38,15 @@ for j = 1:length(ms)
     
     t = K(K(:,1)==1,3);
     maxT = max(t);
-    tt = linspace(0,maxT,30);
+    tt = linspace(0,maxT,20);
     tt = tt(2:end);
     for i = 1:length(tt)
         s = t < tt(i);
         m(i) = 1-sum(s)/length(t);
     end
     
-    Ty(j,:) = tt;
-    Ky(j,:) = m;    
+    Ty(j,:) = [0 tt];
+    Ky(j,:) = [1 m];    
 end
 
 %% PLOTS
@@ -78,7 +78,7 @@ legend('ms100','ms500','ms1000');
 
 %% Runtime failure rate for k=4
 
-figure(3);
+h = figure(3);
 clf
 plot(Ty(1,:),Ky(1,:)*100,'-k','linewidth',2);
 hold on
@@ -88,4 +88,28 @@ hold off
 xlabel('maximum runtime [sec]');
 ylabel('failure rate [%]');
 xlim([0 max(Ty(1:end))]);
-legend('ms100','ms500','ms1000');
+legend('m=100','m=500','m=1000');
+set(gca,'fontsize',12);
+set(h, 'Position', [100, 100, 800, 400]);
+% print success_abb_pre.eps -depsc -r200
+
+%% Runtime break
+
+M = D(D(:,1)==500 & D(:,2)==4, 3:end);
+M = M(M(:,13)<3 & M(:,13)>0, :);
+v = mean(M(:,:));
+
+t1(1) = v(5); % IK time
+t1(2) = v(7); % Collision time
+t1(3) = v(13); % ODE
+t1(4) = v(3); % Total runtime
+
+n1(1) = v(4);
+n1(2) = v(6);
+n1(3) = v(11);
+
+
+
+
+
+

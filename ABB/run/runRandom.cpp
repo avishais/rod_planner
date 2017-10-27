@@ -58,10 +58,14 @@ int main(int argn, char ** args) {
 
 	Matrix D = load();
 
-	for (int i = 0; i < D.size(); i++) {
+	for (int i = 499; i < D.size(); i++) {
 		State v = D[i];
-
 		cout << v[0] << " " << v[1] << " " << v[2] << " " << v[5] << endl;
+
+		/*if (i < 424) {
+			write(v);
+			continue;
+		}*/
 
 		if ( v[0] == 500 && (v[1] == 5 || v[1] == 6) && !v[5] ) {
 			string com = "./pln " + std::to_string((int)runtime) + " " + std::to_string(1) + " " + std::to_string((v[1]==5?3:4)) + " " + std::to_string((int)v[2]);
@@ -71,6 +75,8 @@ int main(int argn, char ** args) {
 		else
 			write(v);
 	}
+
+	return 0;
 }
 
 
