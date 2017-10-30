@@ -204,31 +204,35 @@ int main(int argn, char ** args) {
 
 	}
 
-	int mode = 5;
+	int mode = 2;
 	switch (mode) {
 	case 1 : {
 		map_index = 0;
 		num_nn = 1;
-		vector<string> PRMfile = {"ms6D_500_4.prm", "ms6D_1000_4.prm"};
+		vector<string> PRMfile = {"ms6D_100_5.prm", "ms6D_500_6.prm"};
 		Plan.plan(c_start, c_goal, runtime, PRMfile[map_index], num_nn);
 
 		break;
 	}
 	case 2 : { // Benchmark with the same scenario and PRMmaps over N trials
-		/*std::ofstream ft;
-		ft.open("./matlab/time_sameScenario_30_750_2.txt", ios::app);
+		std::ofstream ft;
+		ft.open("./matlab/Benchmark_poleScene.txt", ios::app);
 
+		int num_nn = 1;
+		int ms_size = 100;
+		int knn_size = 5;
+		string PRMfile = "ms6D_" + std::to_string(ms_size) + "_"  + std::to_string(knn_size) + ".prm";
+		cout << "*** Planning with " << PRMfile << endl;
 
-		map_index = 0;
-		num_nn = 2;
 		int N = 100;
 		for (int i = 0; i < N; i++) {
 			cout << "**************************************" << endl;
 			cout << "Completed " << (double)i/N*100 << "%." << endl;
 			cout << "**************************************" << endl;
-			Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn);
+			Plan.plan(c_start, c_goal, runtime, PRMfile, num_nn);
 
 			// Log
+			ft << ms_size << "\t" << knn_size << "\t";
 			ifstream FromFile;
 			FromFile.open("./paths/perf_log.txt");
 			string line;
@@ -238,7 +242,7 @@ int main(int argn, char ** args) {
 			ft << endl;
 		}
 		ft.close();
-		break;*/
+		break;
 	}
 	case 3 : { // Benchmark with the same scenario and different PRMmaps over N trials
 

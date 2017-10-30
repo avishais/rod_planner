@@ -229,7 +229,7 @@ int main(int argn, char ** args) {
 	I.pop_back();
 
 	std::ofstream ft;
-	ft.open("./matlab/Benchmark_rand_sg_noObs.txt", ios::app);
+	ft.open("./matlab/Benchmark_rand_sg_noObs_500_3.txt", ios::app);
 
 	int i1 = I[query][0];
 	int i2 = I[query][1];

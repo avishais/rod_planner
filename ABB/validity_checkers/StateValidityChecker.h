@@ -213,7 +213,7 @@ private:
 
 	State q1_prev, q2_prev;
 
-	bool withObs = true; // Include obstacles?
+	bool withObs = false; // Include obstacles?
 	double RBS_tol = 0.2;
 	double RBS_max_depth = 100;
 

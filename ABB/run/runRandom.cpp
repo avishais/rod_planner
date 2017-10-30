@@ -21,7 +21,7 @@ Matrix load() {
 	// Load all random confs.
 	Matrix Cdb;
 	std::ifstream File;
-	File.open("./matlab/Benchmark_rand_sg_noObs_b4.txt");
+	File.open("./matlab/Benchmark_rand_sg_noObs.txt");
 	State c_temp(20);
 	int i = 0;
 	while(!File.eof() && i < 1438) {
@@ -41,7 +41,7 @@ Matrix load() {
 
 void write(State v) {
 	std::ofstream ft;
-	ft.open("./matlab/Benchmark_rand_sg_noObs.txt", ios::app);
+	ft.open("./matlab/Benchmark_rand_sg_noObs_new.txt", ios::app);
 
 	for (int i = 0; i < v.size(); i++)
 		ft << v[i] << " ";
@@ -50,6 +50,7 @@ void write(State v) {
 	ft.close();
 }
 
+/*
 int main(int argn, char ** args) {
 	double runtime = 1000;
 
@@ -58,17 +59,16 @@ int main(int argn, char ** args) {
 
 	Matrix D = load();
 
-	for (int i = 499; i < D.size(); i++) {
+	for (int i = 0; i < D.size(); i++) {
 		State v = D[i];
 		cout << v[0] << " " << v[1] << " " << v[2] << " " << v[5] << endl;
 
-		/*if (i < 424) {
-			write(v);
-			continue;
-		}*/
-
-		if ( v[0] == 500 && (v[1] == 5 || v[1] == 6) && !v[5] ) {
-			string com = "./pln " + std::to_string((int)runtime) + " " + std::to_string(1) + " " + std::to_string((v[1]==5?3:4)) + " " + std::to_string((int)v[2]);
+		if ( v[0] == 500 && (v[1] == 5 || v[1] == 6 || v[1] == 3) && !v[5] ) {
+			if (v[1] == 3)
+				runtime = 300;
+			else
+				runtime = 2000;
+			string com = "./pln " + std::to_string((int)runtime) + " " + std::to_string(1) + " " + std::to_string(1) + " " + std::to_string((int)v[2]);
 			const char *y = com.c_str();
 			system(y);
 		}
@@ -78,24 +78,21 @@ int main(int argn, char ** args) {
 
 	return 0;
 }
+*/
 
-
-
-
-
-/*// Just run queries in order
+// Just run queries in order
 int main(int argn, char ** args) {
-	double runtime = 200;
+	double runtime = 1000;
 
 	if (argn == 2)
 		runtime = atof(args[1]);
 
 
-	int N = 108;
-	for (int i = 100; i < N; i++) {
+	int N = 100;
+	for (int i = 11; i < N; i++) {
 
-		for( int j = 0; j < 3; j++) {
-			for (int k = 0; k < 5; k++) {
+		for( int j = 1; j < 2; j++) {
+			for (int k = 1; k < 2; k++) {
 
 				if (j==2 && k==4)
 					continue;
@@ -116,5 +113,5 @@ int main(int argn, char ** args) {
 
 	return 0;
 }
-*/
+
 

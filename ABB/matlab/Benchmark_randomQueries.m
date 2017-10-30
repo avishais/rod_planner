@@ -7,7 +7,8 @@ clear all
 
 %%
 
-D = load('Benchmark_rand_sg_noObs_b4.txt');
+D = load('Benchmark_rand_sg_noObs.txt');
+D = D(D(:,3) <= 99, :);
 
 %% Check
 
@@ -58,3 +59,33 @@ xlabel('k nearest neighbors')
 
 ylabel(hAx(1),'success rate (%)') % left y-axis
 ylabel(hAx(2),'runtime (sec)') % right y-axis
+
+%%
+Y = D(D(:,1)==500 ,[2 3 6 8]); %& D(:,3)==0
+knn = unique(Y(:,1));
+n = unique(Y(:,2));
+E = zeros(length(n), length(knn));
+R = zeros(length(knn), 1);
+
+for i = 1:length(n)
+    M = Y(Y(:,2)==n(i),:);
+    M = sortrows(M,1);
+    [minT, im] = min(M(:,4));
+    for j = 1:size(M,1)
+        if ~M(j,3)
+            continue;
+        end
+        E(i,M(j,1)-1) = (M(j,4) - minT)/minT;
+    end
+    
+    im = M(im,1) - 1;
+    R(im) = R(im) + 1;
+end
+
+v = mean(E(1:end,:));
+
+figure(3)
+subplot(211)
+plot(knn, v);
+subplot(212)
+plot(knn, R);
