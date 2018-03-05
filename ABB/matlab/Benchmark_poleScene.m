@@ -49,6 +49,9 @@ for j = 1:length(ms)
     Ky(j,:) = [1 m];    
 end
 
+Ty = [Ty [4;4;4]];
+Ky = [Ky [0;0;0]];
+
 %% PLOTS
 %% Runtime for each map and density
 
@@ -89,9 +92,10 @@ xlabel('maximum runtime [sec]');
 ylabel('failure rate [%]');
 xlim([0 max(Ty(1:end))]);
 legend('m=100','m=500','m=1000');
-set(gca,'fontsize',12);
-set(h, 'Position', [100, 100, 800, 400]);
-% print success_abb_pre.eps -depsc -r200
+set(gca,'fontsize',13);
+xlim([0 3.5]);
+set(h, 'Position', [100, 100, 800, 250]);
+% print success_abb_prec.eps -depsc -r200
 
 %% Runtime break
 

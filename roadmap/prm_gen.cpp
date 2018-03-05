@@ -17,6 +17,7 @@ PRMGenerator::PRMGenerator() {
 	dimension = is2Dor6D ? 6 : 2;
 	cout << "Problem dimension: " << dimension << endl;
 
+	reset_add_startNgoal_measure();
 }
 
 void PRMGenerator::set_roadmap_parameters(int num_milestones, int num_neighbors, bool save2file) {

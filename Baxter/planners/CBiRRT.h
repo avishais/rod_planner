@@ -65,7 +65,7 @@ namespace ompl
         public:
 
             /** \brief Constructor */
-            CBiRRT(const base::SpaceInformationPtr &si, string, int, int);
+            CBiRRT(const base::SpaceInformationPtr &si, string, int);
 
             virtual ~CBiRRT();
 
@@ -193,8 +193,6 @@ namespace ompl
 
             string prmfile;
             int sNg_k;
-            int iteration_limit = 5000;
-
         };
 
     }

@@ -42,7 +42,7 @@ bool isStateValidC(const ob::State *state)
 	return true;
 }
 
-void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, int sNg_nn, int iter_bound_num) {
+void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, int sNg_nn) {
 
 	// construct the state space we are planning in
 	ob::CompoundStateSpace *cs = new ob::CompoundStateSpace(); // Compound R^12 configuration space
@@ -128,7 +128,7 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 
 	// create a planner for the defined space
 	// To add a planner, the #include library must be added above
-	ob::PlannerPtr planner(new og::CBiRRT(si, PRMfile, sNg_nn, iter_bound_num));
+	ob::PlannerPtr planner(new og::CBiRRT(si, PRMfile, sNg_nn));
 
 	// set the problem we are trying to solve for the planner
 	planner->setProblemDefinition(pdef);
@@ -175,10 +175,62 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 	}
 }
 
+/*
 
 int main(int argn, char ** args) {
 	std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
-	double runtime, map_index, num_nn, iter_bound_num;
+	double runtime, map_index, num_nn;
+	int env = 1;
+
+	if (argn < 4) {
+		cout << "Not enough inputs.\n";
+		return 1;
+	}
+
+	runtime = atof(args[1]);
+	int ms_size = atoi(args[2]);
+	int knn_size = atoi(args[3]);
+
+	srand( time(NULL) );
+
+	plan_C Plan;
+
+	num_nn = 1;
+
+	std::ofstream ft;
+	ft.open("./matlab/Benchmark_baxterScene.txt", ios::app);
+
+	State c_start, c_goal;
+	if (env == 1) { // Example - with pole obstacles
+		c_start = {-0.274424, 4.16854, 0.620378, -12.5859, 6.07027, 1.62385, -0.919663, -0.686512, -0.553633, -0.420825, -0.209649, 1.23071, 1.52842, -0.0170947, -1.00374, -0.946141, 0.228219, -1.12365, -0.147935, -1.02878};
+		c_goal = {0, 0, 5, -10, 8, 0, 0.305935, -1.03039, -0.727934, 0.319778, 0.458636, 0.883846, 0.34995, 0.702649, -1.077, -0.337511, 0.296043, -2.92456, -0.816651, 0.358031};
+	}
+	else if (env == 2) {
+
+	}
+
+	string PRMfile = "ms6D_" + std::to_string(ms_size) + "_"  + std::to_string(knn_size) + ".prm";
+	cout << "*** Planning with " << PRMfile << endl;
+
+	Plan.plan(c_start, c_goal, runtime, PRMfile, num_nn);
+
+	// Log
+	ft << ms_size << "\t" << knn_size << "\t";
+	ifstream FromFile;
+	FromFile.open("./paths/perf_log.txt");
+	string line;
+	while (getline(FromFile, line))
+		ft << line << "\t";
+	FromFile.close();
+	ft << endl;
+}
+
+*/
+
+
+int main(int argn, char ** args) {
+	std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
+	double runtime, map_index, num_nn;
 	int env = 1;
 
 	if (argn == 1)
@@ -189,12 +241,10 @@ int main(int argn, char ** args) {
 	if (argn>2) {
 		map_index = atoi(args[2]);
 		num_nn = atoi(args[3]);
-		iter_bound_num = atoi(args[4]);
 	}
 	else {
 		map_index = 1;
 		num_nn = 2;
-		iter_bound_num = 1e9;
 	}
 
 
@@ -237,10 +287,9 @@ int main(int argn, char ** args) {
 	int mode = 1;
 	switch (mode) {
 	case 1 : {
-		map_index = 1;
+		map_index = 3;
 		num_nn = 1;
-		iter_bound_num = 1e9;
-		Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
+		Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn);
 
 		break;
 	}
@@ -251,13 +300,12 @@ int main(int argn, char ** args) {
 
 		map_index = 0;
 		num_nn = 2;
-		iter_bound_num = 1e9;
 		int N = 100;
 		for (int i = 0; i < N; i++) {
 			cout << "**************************************" << endl;
 			cout << "Completed " << (double)i/N*100 << "%." << endl;
 			cout << "**************************************" << endl;
-			Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
+			Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn);
 
 			// Log
 			ifstream FromFile;
@@ -274,17 +322,16 @@ int main(int argn, char ** args) {
 	case 3 : { // Benchmark with the same scenario and different PRMmaps over N trials
 		vector<int> prmk = {2,3,4,5,6};
 		int k = 2;
-		iter_bound_num = 1e9;
 		std::ofstream ft;
 
-		for( int j = 2; j < 3/*PRMfile.size()*/; j++) {
+		for( int j = 2; j < PRMfile.size(); j++) {
 
 			int N = 100;
 			for (int i = 0; i < N; i++) {
 				cout << "**************************************" << endl;
 				cout << "Completed " << (double)i/N*100 << "%." << endl;
 				cout << "**************************************" << endl;
-				Plan.plan(c_start, c_goal, runtime+load_time[j], PRMfile[j], k, iter_bound_num);
+				Plan.plan(c_start, c_goal, runtime+load_time[j], PRMfile[j], k);
 
 				// Log
 				ft.open("./matlab/time_poleScene_MS1000_new.txt", ios::app);

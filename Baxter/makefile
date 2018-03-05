@@ -29,5 +29,5 @@ CPPPQP = ${INC_VALIDITY}collisionDetection.cpp ${INC_VALIDITY}model.cpp
 
 all:
 	${CXX} ${CPP_PLN} ${CPP_PRM} ${CPPPQP} -o pln ${CXXFLAGS} ${LDFLAGS} -std=c++11 #-Wall
-
+	g++ ./run/Run.cpp -o Run -std=c++11
 

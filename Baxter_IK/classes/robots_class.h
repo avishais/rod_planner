@@ -59,8 +59,7 @@ public:
 	//ChainFkSolverPos_recursive fksolver;
 	KDL::JntArray jointpositions;
 	KDL::Frame cartposFK; // Create the frame that will contain the FK results
-	KDL::Frame cartposIK; // Create the frame that will contain the FK results
-
+	KDL::Frame cartposIK; // Create the frame that will contain the IK results
 
 	// Forward kinematics
 	void FKsolve_rob(State, int);

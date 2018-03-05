@@ -170,7 +170,56 @@ void plan_C::plan(State c_start, State c_goal, double runtime, string PRMfile, i
 	}
 }
 
+int main(int argn, char ** args) {
+	std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
+	double runtime, map_index, num_nn;
+	int env = 1;
 
+	if (argn < 4) {
+		cout << "Not enough inputs.\n";
+		return 1;
+	}
+
+	runtime = atof(args[1]);
+	int ms_size = atoi(args[2]);
+	int knn_size = atoi(args[3]);
+
+	srand( time(NULL) );
+
+	plan_C Plan;
+
+	num_nn = 1;
+
+	std::ofstream ft;
+	ft.open("./matlab/Benchmark_poleScene_ODEanalysis.txt", ios::app);
+
+	State c_start, c_goal;
+	if (env == 1) { // Example - with pole obstacles
+		c_start = {1.13317, -4.08401, 2.74606, 6.786018, 11.63367, -5.103594, -0.209439510239320, 0.122173047639603,	0.174532925199433, 1.30899693899575, 0.261799387799149, 0.698131700797732, -0.106584015572764, 1.06335198985049, 0.282882132165777, -0.115210802424076, -1.95829181139617, -1.35961844319303};
+		c_goal = {1.8708,-1.3245,2.944,3.7388,6.5021,-0.01924,0.4,0.3,1,-0.1,-0.57118,-0.4,-0.84385,0.73392,0.2169,0.52291,-1.1915,2.6346};
+	}
+	else if (env == 2) {
+
+	}
+
+	string PRMfile = "ms6D_" + std::to_string(ms_size) + "_"  + std::to_string(knn_size) + ".prm";
+	cout << "*** Planning with " << PRMfile << endl;
+
+	Plan.plan(c_start, c_goal, runtime, PRMfile, num_nn);
+
+	// Log
+	ft << ms_size << "\t" << knn_size << "\t";
+	ifstream FromFile;
+	FromFile.open("./paths/perf_log.txt");
+	string line;
+	while (getline(FromFile, line))
+		ft << line << "\t";
+	FromFile.close();
+	ft << endl;
+}
+
+
+/*
 int main(int argn, char ** args) {
 	std::cout << "OMPL version: " << OMPL_VERSION << std::endl;
 	double runtime, map_index, num_nn;
@@ -204,7 +253,7 @@ int main(int argn, char ** args) {
 
 	}
 
-	int mode = 2;
+	int mode = 3;
 	switch (mode) {
 	case 1 : {
 		map_index = 0;
@@ -251,22 +300,22 @@ int main(int argn, char ** args) {
 		num_nn = 1;
 
 		std::ofstream ft;
-		ft.open("./matlab/Benchmark_poleScene.txt", ios::app);
+		ft.open("./matlab/Benchmark_poleScene_ODEanalysis.txt", ios::app);
 
-		int N = 68;
+		int N = 1;
 		for (int i = 0; i < N; i++) {
 
-			for( int j = 1; j < 2/*ms_size.size()*/; j++) {
+			for( int j = 0; j < ms_size.size(); j++) {
 				for (int k = 0; k < knn_size.size(); k++) {
 
-					if (k==2)
-						continue;
+					//if (k==2)
+					//	continue;
 
 					if (ms_size[j]==1000 && knn_size[k]==6)
 						continue;
 
-					if (ms_size[j]==100 && (knn_size[k]==2 || knn_size[k]==3 || knn_size[k]==5))
-						continue;
+					//if (ms_size[j]==100 && (knn_size[k]==2 || knn_size[k]==3 || knn_size[k]==5))
+					//	continue;
 
 					string PRMfile = "ms6D_" + std::to_string(ms_size[j]) + "_"  + std::to_string(knn_size[k]) + ".prm";
 					cout << "*** Planning with " << PRMfile << endl;
@@ -466,4 +515,4 @@ int main(int argn, char ** args) {
 	return 0;
 }
 
-
+*/

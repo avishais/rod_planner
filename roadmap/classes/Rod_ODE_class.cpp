@@ -17,7 +17,10 @@ rod_ode::rod_ode() {
 	setC(1);
 	setL(1);
 	setDiscretizationSize(500);
-	msg = false;
+
+	odes_counter = 0;
+	valid_odes_counter = 0;
+	odes_time = 0;
 }
 
 // ---Setters---
@@ -677,8 +680,6 @@ bool rod_ode::isRodFeasible_old(State a) {
 	odes_counter++;
 	clock_t begin = clock();
 
-	if (msg) print_A_State(a);
-
 	State x = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, a[0], a[1], a[2], a[3], a[4], a[5], 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
 	for (int i = 0; i < 36; i++)
 		x.push_back(0);
@@ -698,7 +699,6 @@ bool rod_ode::isRodFeasible_old(State a) {
 	// Check for stability
 	for (int i = 1; i < points_on_rod; i++) {
 		if (determinant(J[i]) <= 0) {
-			if (msg) cout << "Rod non-stable." << endl;
 			clock_t end = clock();
 			odes_time += double(end - begin) / CLOCKS_PER_SEC;
 			valid_odes_counter++;
@@ -710,13 +710,11 @@ bool rod_ode::isRodFeasible_old(State a) {
 	if (Rod_Collision()) {
 		clock_t end = clock();
 		odes_time += double(end - begin) / CLOCKS_PER_SEC;
-		if (msg) cout << "Rod feasible." << endl;
 		return true;
 	}
 	else {
 		clock_t end = clock();
 		odes_time += double(end - begin) / CLOCKS_PER_SEC;
-		if (msg) cout << "Rod in self collision." << endl;
 		return false;
 	}
 }
@@ -729,8 +727,6 @@ int rod_ode::conjugate_point(State a) {
 	odes_counter++;
 	valid_odes_counter++;
 	clock_t begin = clock();
-
-	if (msg) print_A_State(a);
 
 	State x = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, a[0], a[1], a[2], a[3], a[4], a[5], 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
 	for (int i = 0; i < 36; i++)
@@ -780,8 +776,6 @@ int rod_ode::conjugate_point_old(State a) {
 	odes_counter++;
 	valid_odes_counter++;
 	clock_t begin = clock();
-
-	if (msg) print_A_State(a);
 
 	State x = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, a[0], a[1], a[2], a[3], a[4], a[5], 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
 	for (int i = 0; i < 36; i++)

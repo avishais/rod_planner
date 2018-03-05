@@ -46,8 +46,6 @@ private:
 	MatrixListList Tlist; // Transformation matrices along the rod 4x4 for each conf. along a set of a's
 	State path_conjugate_points; // Stores the conjugate points for a set of a's
 
-	bool msg; // Output messages during computation
-
 	int collision_point;
 	const double rod_collision_tol = 16;
 

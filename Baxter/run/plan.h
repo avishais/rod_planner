@@ -34,7 +34,7 @@ public:
 
 	plan_C() {};
 
-	void plan(State c_start, State c_goal, double runtime, string, int, int);
+	void plan(State c_start, State c_goal, double runtime, string, int);
 
 	bool solved_bool;
 	double total_runtime;
