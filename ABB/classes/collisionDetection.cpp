@@ -1,6 +1,6 @@
 #include "collisionDetection.h"
 
-#define CADLINK "/home/avishai/Downloads/omplapp/ompl/Workspace/precomputation/ABB/simulator/"
+#define CADLINK "/home/avishai/Documents/workspace/rod_planner/ABB/simulator/"
 
 int collisionDetection::collision_state(Matrix M, Vector q1, Vector q2, PQP_REAL tolerance)
 // Returns 0 if no collision

@@ -20,7 +20,7 @@ int main(int argc, char** argv){
 		saveFile = 1;
 	}
 
-	srand (time(NULL));
+	srand (2);//time(NULL));
 
 	// generating a Prob. Roadmap
 	PRMGenerator PRMGraph;

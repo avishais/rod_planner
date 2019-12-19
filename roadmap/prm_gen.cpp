@@ -16,6 +16,7 @@ PRMGenerator::PRMGenerator() {
 
 	dimension = is2Dor6D ? 6 : 2;
 	cout << "Problem dimension: " << dimension << endl;
+	srand (2);//time(NULL));
 
 }
 
