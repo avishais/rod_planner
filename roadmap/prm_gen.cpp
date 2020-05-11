@@ -78,7 +78,7 @@ void PRMGenerator::valid_milestone_gen(int &num_subsamples){
 }
 
 void PRMGenerator::generate_roadmap(){
-	cout << "Starting roadmap generation..." << endl;
+	cout << "Starting roadmap (m = " << num_pts << ") generation..." << endl;
 	// number of required points in space
 	int num_subsamples = num_pts;
 	initMatrix(ms.milestones, num_subsamples, dimension);
@@ -1021,13 +1021,13 @@ void PRMGenerator::save_roadmap_to_file(){
 
 	cout << "Saving roadmap to txt files..." << endl;
 
-	std::string pathSoln("./data/soln.txt");
-	std::string pathStones("./data/milestones.txt");
-	std::string pathDist("./data/distances.txt");
-	std::string pathNear("./data/nearest.txt");
-	std::string pathDistGraph("./data/dis_graph.txt");
-	std::string pathParentGraph("./data/parent_graph.txt");
-	std::string pathSubStones("./data/sub_milestones.txt");
+	std::string pathSoln("/home/avishai/Documents/workspace/rod_planner/roadmap/data/soln.txt");
+	std::string pathStones("/home/avishai/Documents/workspace/rod_planner/roadmap/data/milestones.txt");
+	std::string pathDist("/home/avishai/Documents/workspace/rod_planner/roadmap/data/distances.txt");
+	std::string pathNear("/home/avishai/Documents/workspace/rod_planner/roadmap/data/nearest.txt");
+	std::string pathDistGraph("/home/avishai/Documents/workspace/rod_planner/roadmap/data/dis_graph.txt");
+	std::string pathParentGraph("/home/avishai/Documents/workspace/rod_planner/roadmap/data/parent_graph.txt");
+	std::string pathSubStones("/home/avishai/Documents/workspace/rod_planner/roadmap/data/sub_milestones.txt");
 
 	std::ofstream FILE(pathStones);//, std::ofstream::app);
 	for(int i=0;i!=ms.milestones.size();i++){
@@ -1079,7 +1079,7 @@ void PRMGenerator::save_data() {
 	if (!is2Dor6D)
 		ofs.open("./data/ms2D.prm", ios::binary);
 	else {
-		string file = "./data/ms6D_" + to_string((int)num_pts) + "_" + to_string(k) + ".prm";
+		string file = "/home/avishai/Documents/workspace/rod_planner/roadmap/data/ms6D_" + to_string((int)num_pts) + "_" + to_string(k) + ".prm";
 		const char *y = file.c_str();
 		ofs.open(y, ios::binary);
 	}
@@ -1216,7 +1216,7 @@ void PRMGenerator::load_data(string filename) {
 	if (!is2Dor6D)
 		ifs.open("./data/ms2D.prm", ios::binary);
 	else
-		ifs.open("../roadmap/data/" + filename, ios::binary);
+		ifs.open("/home/avishai/Documents/workspace/rod_planner/roadmap/data/" + filename, ios::binary);
 	if (!ifs.is_open()) {
 		cout << "Error opening file name: " << filename << endl;
 		exit(1);

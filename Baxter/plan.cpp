@@ -359,12 +359,13 @@ int main(int argn, char ** args) {
 		State c_goal = {0, 3.5, 0, 0, 0, 0, 0, -0.8, -0.1, 0.6, 0, -1.3, -1.5, 0.0196822, -0.807394, -0.275271, 0.715919, -0.475965, -1.49528, 1.81508};
 
 
+		runtime = 30;
 		int N = 1;//Cdb.size();
 		for (int i = 0; i < N; i++) {
 			cout << "**************************************" << endl;
 			cout << "Completed " << (double)i/N*100 << "%." << endl;
 			cout << "**************************************" << endl;
-			bool success = Plan.plan(c_start, c_goal, runtime+load_time[2], "ms6D_500_4.prm", 2);
+			bool success = Plan.plan(c_start, c_goal, runtime+load_time[2], "ms6D_50_4.prm", 2);
 
 			if (success) {
 				cout << "Solution " << i << ".\n";
@@ -375,6 +376,12 @@ int main(int argn, char ** args) {
 			//extract_from_perf_file(ft);
 			//ft << endl;
 		}
+
+		std::ofstream ft;
+		ft.open("./stats/stats_ms6D_20_4.txt", ios::app);
+		ft << 50 << " B " << Plan.solved_bool << " " << Plan.total_runtime << endl;
+		ft.close();
+
 		//ft.close();
 		break;
 	}

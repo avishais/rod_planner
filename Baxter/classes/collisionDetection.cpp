@@ -1,6 +1,6 @@
 #include "collisionDetection.h"
 
-#define CADLINK "/home/avishai/Downloads/omplapp/ompl/Workspace/precomputation/Baxter/simulator/"
+#define CADLINK "/home/avishai/Documents/workspace/rod_planner/Baxter/simulator/"
 
 collisionDetection::collisionDetection() {
 

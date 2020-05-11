@@ -15,8 +15,8 @@ int main(int argc, char** argv){
 	}
 	else {
 		cout << "Defining default inputs." << endl;
-		num_pts = 10;
-		k = 2;
+		num_pts = 100;
+		k = 4;
 		saveFile = 1;
 	}
 

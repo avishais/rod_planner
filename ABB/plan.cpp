@@ -289,10 +289,8 @@ int main(int argn, char ** args) {
 	//vector<string> PRMfile = {"ms6D_1000_2.prm","ms6D_1000_3.prm","ms6D_1000_4.prm","ms6D_1000_5.prm","ms6D_100_2.prm","ms6D_100_3.prm","ms6D_100_4.prm","ms6D_100_5.prm","ms6D_100_6.prm"};
 	//vector<double> load_time = {8, 15, 16, 20,1.5, 3, 3.5, 4, 5}; // Average time required to load the map
 
-	vector<string> PRMfile = {"ms6D_50_4.prm", "ms6D_100_4.prm"};
-	vector<double> load_time = {100, 16};
-
-
+	vector<string> PRMfile = {"ms6D_20_4.prm", "ms6D_100_4.prm"};
+	vector<double> load_time = {10, 10};
 
 	int mode = 2;
 	switch (mode) {
@@ -347,11 +345,19 @@ int main(int argn, char ** args) {
 		Vector c_goal = {1.8708,-1.3245,2.944,3.7388,6.5021,-0.01924,0.4,0.3,1,-0.1,-0.57118,-0.4,-0.84385,0.73392,0.2169,0.52291,-1.1915,2.6346};
 		//1.8708,-1.3245,2.944,3.7388,6.5021,-0.01924,1.2557,0.8,-0.46087,-0.74742,0.57118,1.7,-0.95019,1.4717,-0.94615,0.73362,-1.7091,2.6137};
 
-
 		map_index = 0;
 		num_nn = 2;
+		runtime = 30;
 		iter_bound_num = 1e9;
-		Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
+		Plan.plan(c_start, c_goal, runtime+load_time[map_index], "ms6D_100_4.prm", num_nn, iter_bound_num);
+
+		cout << "Back\n";
+
+		std::ofstream ft;
+		ft.open("./stats/stats_rm.txt", ios::app);
+		ft << 100 << " A ";
+		ft << Plan.solved_bool << " " << Plan.total_runtime << " ";
+		ft.close();
 
 		break;
 	}

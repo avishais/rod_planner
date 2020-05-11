@@ -11,7 +11,6 @@ void o(T a) {
 	cout << a << endl;
 }
 
-
 // Constructor
 rod_ode::rod_ode() {
 	setC(1);

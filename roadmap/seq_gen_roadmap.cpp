@@ -15,10 +15,10 @@
 
 int main() {
 	
-	int N[] = {100, 300, 500, 600, 800, 1000};
-	int K[] = {4, 4, 4, 4, 4, 4};
+	int N[] = {20};
+	int K[] = {4};
 
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 1; i++) {
 		std::cout << "Computing roadmap with " << N[i] << " milestones and " << K[i] << " neighbors." << std::endl;
 		// run trial
 		std::string com = "./gen " + std::to_string(N[i]) + " " + std::to_string(K[i]) + " 1";
