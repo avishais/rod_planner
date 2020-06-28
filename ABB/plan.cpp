@@ -44,6 +44,11 @@ bool isStateValidC(const ob::State *state)
 	return true;
 }
 
+ob::PlannerPtr plan_C::allocatePlanner(ob::SpaceInformationPtr si, string PRMfile, int sNg_nn, int iter_bound_num)
+{
+	return std::make_shared<og::RRTConnect>(si, PRMfile, sNg_nn, iter_bound_num); 
+}
+
 void plan_C::plan(Vector c_start, Vector c_goal, double runtime, string PRMfile, int sNg_nn, int iter_bound_num) {
 
 	// construct the state space we are planning in
@@ -123,11 +128,13 @@ void plan_C::plan(Vector c_start, Vector c_goal, double runtime, string PRMfile,
 
 	// set the start and goal states
 	pdef->setStartAndGoalStates(start, goal);
-	pdef->print();
+	// pdef->print();
 
 	// create a planner for the defined space
 	// To add a planner, the #include library must be added above
-	ob::PlannerPtr planner(new og::RRTConnect(si, PRMfile, sNg_nn, iter_bound_num));
+	ob::PlannerPtr planner = allocatePlanner(si, PRMfile, sNg_nn, iter_bound_num);
+
+	// ob::PlannerPtr planner(new og::RRTConnect(si, PRMfile, sNg_nn, iter_bound_num));
 	//ob::PlannerPtr planner(new og::RRT(si));
 	//ob::PlannerPtr planner(new og::BiTRRT(si));
 	//ob::	PlannerPtr planner(new og::LazyRRT(si));
@@ -154,13 +161,15 @@ void plan_C::plan(Vector c_start, Vector c_goal, double runtime, string PRMfile,
 	//pdef->print(std::cout); // Prints problem definition such as start and goal states and optimization objective
 
 	// attempt to solve the problem within one second of planning time
-	clock_t begin = clock();
+	// solved_bool = false;
+	// clock_t begin = clock();
 	ob::PlannerStatus solved = planner->solve(runtime);
-	clock_t end = clock();
-	total_runtime = double(end - begin) / CLOCKS_PER_SEC;
-	cout << "Runtime: " << total_runtime << endl;
+	// clock_t end = clock();
+	// total_runtime = double(end - begin) / CLOCKS_PER_SEC;
+	// cout << "Runtime: " << total_runtime << endl;
+	solved_bool = (bool)solved;
 
-	if (solved) {
+	// if (solved) {
 		// get the goal representation from the problem definition (not the same as the goal state)
 		// and inquire about the found path
 		/*ob::PathPtr path = pdef->getSolutionPath();
@@ -175,20 +184,22 @@ void plan_C::plan(Vector c_start, Vector c_goal, double runtime, string PRMfile,
 		og::PathGeometric& pog = static_cast<og::PathGeometric&>(*path); // Transform into geometric path class
 		pog.printAsMatrix(myfile); // Print as matrix to file
 		myfile.close();*/
-		solved_bool = true;
-	}
-	else {
-		std::cout << "No solutions found" << std::endl;
-		solved_bool = false;
-	}
+		// std::cout << "Found solution" << std::endl;
+		// solved_bool = true;
+	// }
+	// else {
+		// std::cout << "No solutions found" << std::endl;
+	// }
+	// std::cout << "Out" << std::endl;
 }
 
 
 
 void load_random_nodes(Matrix &Cdb) {
+	cout << "Getting random nodes." << endl;
 
 	std::ifstream File;
-	File.open("/home/avishai/Downloads/omplapp/ompl/Workspace/cplanner/generate_random_nodes/randomnodes.txt");
+	File.open("/home/avishai/Documents/workspace/rod_planner_vanilla/validity_checkers/randomnodes.txt");
 	//File.open("randomnodes.txt");
 
 	Vector c_temp(18);
@@ -197,11 +208,12 @@ void load_random_nodes(Matrix &Cdb) {
 	while(!File.eof()) {
 		for (int j=0; j < 18; j++) {
 			File >> c_temp[j];
-			//cout << c_temp[j] << " ";
+			// cout << c_temp[j] << " ";
 		}
-		//cout << endl;
+		// cout << endl;
 		Cdb.push_back(c_temp);
 		i++;
+		// cout << i << endl;
 	}
 	File.close();
 	Cdb.pop_back();
@@ -257,7 +269,7 @@ int main(int argn, char ** args) {
 	double runtime, map_index, num_nn, iter_bound_num;
 
 	if (argn == 1)
-		runtime = 1; // sec
+		runtime = 10; // sec
 	else
 		runtime = atof(args[1]);
 
@@ -275,7 +287,6 @@ int main(int argn, char ** args) {
 
 	plan_C Plan;
 
-
 	// PRM data
 	//vector<string> PRMfile = {"ms6D_100_2.prm", "ms6D_1000_2.prm","ms6D_2000_2.prm","ms6D_5000_2.prm"};
 	//vector<string> PRMfile = {"ms6D_100_2.prm", "ms6D_300_2.prm", "ms6D_750_2.prm", "ms6D_1000_2.prm","ms6D_1500_2.prm","ms6D_2000_2.prm"};
@@ -289,10 +300,10 @@ int main(int argn, char ** args) {
 	//vector<string> PRMfile = {"ms6D_1000_2.prm","ms6D_1000_3.prm","ms6D_1000_4.prm","ms6D_1000_5.prm","ms6D_100_2.prm","ms6D_100_3.prm","ms6D_100_4.prm","ms6D_100_5.prm","ms6D_100_6.prm"};
 	//vector<double> load_time = {8, 15, 16, 20,1.5, 3, 3.5, 4, 5}; // Average time required to load the map
 
-	vector<string> PRMfile = {"ms6D_20_4.prm", "ms6D_100_4.prm"};
+	vector<string> PRMfile = {"ms6D_50_4.prm", "ms6D_100_4.prm"};
 	vector<double> load_time = {10, 10};
 
-	int mode = 2;
+	int mode = 1;
 	switch (mode) {
 	case 1 : {
 		srand (time(NULL));
@@ -300,22 +311,31 @@ int main(int argn, char ** args) {
 		Matrix Cdb;
 		load_random_nodes(Cdb);
 
+		cout << Cdb.size() << endl;
+
 		std::ofstream ft;
 		ft.open("timesC.txt", ios::app);
 
 		int p1, p2;
-		for (int j = 0; j < 10; j++) {
-			do {
-				p1 = rand() % Cdb.size();
-				p2 = rand() % Cdb.size();
+		for (int j = 47; j < 100; j++) {
+			// do {
+			// 	p1 = rand() % Cdb.size();
+			// 	p2 = rand() % Cdb.size();
 
-			} while (p1==p2);
+			// } while (p1==p2);
+			p1 = j;
+			p2 = j + 1;
 
 			cout << p1 << " " << p2 << endl;
 
-			map_index = 0;
-			num_nn = 2;
-			Plan.plan(Cdb[p1], Cdb[p2], runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
+			map_index = 1;
+			num_nn = 3;
+			runtime = 200;
+			try {
+				Plan.plan(Cdb[p1], Cdb[p2], runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
+			} catch (std::exception& e){
+				std::cout << " a standard exception was caught, with message '" << e.what() << "'\n";
+			}
 
 			// Log
 			ft << p1 << "\t" << p2 << "\t";
@@ -324,7 +344,6 @@ int main(int argn, char ** args) {
 
 			if (suc) {
 				cout << "Found solution for random query.\n";
-				break;
 			}
 		}
 		ft.close();
@@ -349,7 +368,7 @@ int main(int argn, char ** args) {
 		num_nn = 2;
 		runtime = 30;
 		iter_bound_num = 1e9;
-		Plan.plan(c_start, c_goal, runtime+load_time[map_index], "ms6D_100_4.prm", num_nn, iter_bound_num);
+		Plan.plan(c_start, c_goal, runtime+load_time[map_index], PRMfile[map_index], num_nn, iter_bound_num);
 
 		cout << "Back\n";
 

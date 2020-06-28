@@ -57,6 +57,8 @@ public:
 
 	void plan(Vector c_start, Vector c_goal, double runtime, string, int, int);
 
+	ob::PlannerPtr allocatePlanner(ob::SpaceInformationPtr, string, int, int);
+
 	bool solved_bool;
 	double total_runtime;
 	int ode_count;
